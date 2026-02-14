@@ -2,8 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, useLocation } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { AnimatePresence } from "framer-motion";
 
 const SplashScreen = lazy(() => import("./pages/SplashScreen"));
 const OnboardingScreen = lazy(() => import("./pages/OnboardingScreen"));
@@ -27,6 +28,29 @@ const Loading = () => (
   </div>
 );
 
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<SplashScreen />} />
+        <Route path="/onboarding" element={<OnboardingScreen />} />
+        <Route path="/login" element={<LoginScreen />} />
+        <Route path="/verify-otp" element={<OtpVerificationScreen />} />
+        <Route path="/add-vehicle" element={<AddVehicleScreen />} />
+        <Route path="/vehicle-added" element={<VehicleAddedScreen />} />
+        <Route path="/home" element={<HomeScreen />} />
+        <Route path="/parking/:id/slots" element={<SlotSelectionScreen />} />
+        <Route path="/booking-summary" element={<BookingSummaryScreen />} />
+        <Route path="/selection-success" element={<SelectionSuccessScreen />} />
+        <Route path="/vehicles" element={<MyVehiclesScreen />} />
+        <Route path="/profile" element={<ProfileScreen />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -34,21 +58,7 @@ const App = () => (
       <Sonner />
       <HashRouter>
         <Suspense fallback={<Loading />}>
-          <Routes>
-            <Route path="/" element={<SplashScreen />} />
-            <Route path="/onboarding" element={<OnboardingScreen />} />
-            <Route path="/login" element={<LoginScreen />} />
-            <Route path="/verify-otp" element={<OtpVerificationScreen />} />
-            <Route path="/add-vehicle" element={<AddVehicleScreen />} />
-            <Route path="/vehicle-added" element={<VehicleAddedScreen />} />
-            <Route path="/home" element={<HomeScreen />} />
-            <Route path="/parking/:id/slots" element={<SlotSelectionScreen />} />
-            <Route path="/booking-summary" element={<BookingSummaryScreen />} />
-            <Route path="/selection-success" element={<SelectionSuccessScreen />} />
-            <Route path="/vehicles" element={<MyVehiclesScreen />} />
-            <Route path="/profile" element={<ProfileScreen />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AnimatedRoutes />
         </Suspense>
       </HashRouter>
     </TooltipProvider>
