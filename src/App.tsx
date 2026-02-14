@@ -6,18 +6,19 @@ import { HashRouter, Routes, Route, useLocation } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { AnimatePresence } from "framer-motion";
 
-const SplashScreen = lazy(() => import("./pages/SplashScreen"));
-const OnboardingScreen = lazy(() => import("./pages/OnboardingScreen"));
-const LoginScreen = lazy(() => import("./pages/LoginScreen"));
-const OtpVerificationScreen = lazy(() => import("./pages/OtpVerificationScreen"));
-const AddVehicleScreen = lazy(() => import("./pages/AddVehicleScreen"));
-const VehicleAddedScreen = lazy(() => import("./pages/VehicleAddedScreen"));
-const HomeScreen = lazy(() => import("./pages/HomeScreen"));
-const SlotSelectionScreen = lazy(() => import("./pages/SlotSelectionScreen"));
-const BookingSummaryScreen = lazy(() => import("./pages/BookingSummaryScreen"));
-const SelectionSuccessScreen = lazy(() => import("./pages/SelectionSuccessScreen"));
-const MyVehiclesScreen = lazy(() => import("./pages/MyVehiclesScreen"));
-const ProfileScreen = lazy(() => import("./pages/ProfileScreen"));
+import SplashScreen from "./pages/SplashScreen";
+import OnboardingScreen from "./pages/OnboardingScreen";
+import LoginScreen from "./pages/LoginScreen";
+import OtpVerificationScreen from "./pages/OtpVerificationScreen";
+import AddVehicleScreen from "./pages/AddVehicleScreen";
+import VehicleAddedScreen from "./pages/VehicleAddedScreen";
+import HomeScreen from "./pages/HomeScreen";
+import SlotSelectionScreen from "./pages/SlotSelectionScreen";
+import BookingSummaryScreen from "./pages/BookingSummaryScreen";
+import SelectionSuccessScreen from "./pages/SelectionSuccessScreen";
+import MyVehiclesScreen from "./pages/MyVehiclesScreen";
+import ProfileScreen from "./pages/ProfileScreen";
+
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
