@@ -13,7 +13,8 @@ const SelectionSuccessScreen = () => {
   const slotNumber = state?.slotNumber || "A3";
   const duration = state?.duration || "2 Hours";
   const totalPrice = state?.totalPrice || 80;
-  const date = state?.date || "";
+  const startDate = state?.startDate || "";
+  const endDate = state?.endDate || "";
   const startTime = state?.startTime || "";
   const endTime = state?.endTime || "";
 
@@ -25,8 +26,9 @@ const SelectionSuccessScreen = () => {
   const details = [
     { icon: MapPin, label: "Parking", value: `Phoenix Mall • Slot ${slotNumber}` },
     { icon: Car, label: "Vehicle", value: "TN 01 AB 1234" },
-    ...(date ? [{ icon: CalendarDays, label: "Date", value: date }] : []),
-    { icon: Clock, label: "Time", value: startTime && endTime ? `${startTime} – ${endTime} (${duration})` : duration },
+    ...(startDate ? [{ icon: CalendarDays, label: "Start", value: `${startDate}, ${startTime}` }] : []),
+    ...(endDate ? [{ icon: CalendarDays, label: "End", value: `${endDate}, ${endTime}` }] : []),
+    { icon: Clock, label: "Duration", value: duration },
     { icon: IndianRupee, label: "Estimated Price", value: `₹${totalPrice}` },
   ];
 
