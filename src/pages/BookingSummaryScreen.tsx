@@ -40,7 +40,8 @@ const BookingSummaryScreen = () => {
   const price = state?.price || 40;
 
   const now = new Date();
-  const [date, setDate] = useState<Date>(now);
+  const [startDate, setStartDate] = useState<Date>(now);
+  const [endDate, setEndDate] = useState<Date>(now);
   const [startTime, setStartTime] = useState(() => {
     const h = now.getHours();
     const m = now.getMinutes() < 30 ? 30 : 0;
@@ -53,33 +54,29 @@ const BookingSummaryScreen = () => {
   });
   const [loading, setLoading] = useState(false);
 
+  const totalMinutes = useMemo(() => {
+    const [sh, sm] = startTime.split(":").map(Number);
+    const [eh, em] = endTime.split(":").map(Number);
+    const startMs = new Date(startDate).setHours(sh, sm, 0, 0);
+    const endMs = new Date(endDate).setHours(eh, em, 0, 0);
+    let diffMin = Math.round((endMs - startMs) / 60000);
+    if (diffMin <= 0) diffMin = 30; // minimum 30 min
+    return diffMin;
+  }, [startDate, endDate, startTime, endTime]);
+
   const durationText = useMemo(() => {
-    const [sh, sm] = startTime.split(":").map(Number);
-    const [eh, em] = endTime.split(":").map(Number);
-    let totalMin = (eh * 60 + em) - (sh * 60 + sm);
-    if (totalMin <= 0) totalMin += 24 * 60;
-    const hrs = Math.floor(totalMin / 60);
-    const mins = totalMin % 60;
-    if (hrs === 0) return `${mins} min`;
-    if (mins === 0) return `${hrs} hr${hrs > 1 ? "s" : ""}`;
-    return `${hrs} hr${hrs > 1 ? "s" : ""} ${mins} min`;
-  }, [startTime, endTime]);
+    const days = Math.floor(totalMinutes / (24 * 60));
+    const hrs = Math.floor((totalMinutes % (24 * 60)) / 60);
+    const mins = totalMinutes % 60;
+    const parts: string[] = [];
+    if (days > 0) parts.push(`${days} day${days > 1 ? "s" : ""}`);
+    if (hrs > 0) parts.push(`${hrs} hr${hrs > 1 ? "s" : ""}`);
+    if (mins > 0) parts.push(`${mins} min`);
+    return parts.join(" ") || "0 min";
+  }, [totalMinutes]);
 
-  const totalPrice = useMemo(() => {
-    const [sh, sm] = startTime.split(":").map(Number);
-    const [eh, em] = endTime.split(":").map(Number);
-    let totalMin = (eh * 60 + em) - (sh * 60 + sm);
-    if (totalMin <= 0) totalMin += 24 * 60;
-    return Math.ceil(totalMin / 60) * price;
-  }, [startTime, endTime, price]);
-
-  const durationHours = useMemo(() => {
-    const [sh, sm] = startTime.split(":").map(Number);
-    const [eh, em] = endTime.split(":").map(Number);
-    let totalMin = (eh * 60 + em) - (sh * 60 + sm);
-    if (totalMin <= 0) totalMin += 24 * 60;
-    return Math.ceil(totalMin / 60);
-  }, [startTime, endTime]);
+  const durationHours = useMemo(() => Math.ceil(totalMinutes / 60), [totalMinutes]);
+  const totalPrice = useMemo(() => durationHours * price, [durationHours, price]);
 
   const handleConfirm = () => {
     setLoading(true);
@@ -89,7 +86,8 @@ const BookingSummaryScreen = () => {
         replace: true,
         state: {
           slotNumber,
-          date: format(date, "PPP"),
+          startDate: format(startDate, "PPP"),
+          endDate: format(endDate, "PPP"),
           startTime: formatTime12(startTime),
           endTime: formatTime12(endTime),
           duration: durationText,
@@ -189,49 +187,69 @@ const BookingSummaryScreen = () => {
             </motion.div>
           ))}
 
-          {/* Date picker */}
+          {/* Start date & time */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="bg-card border border-border rounded-2xl p-5"
           >
-            <p className="text-caption font-semibold text-muted-foreground uppercase tracking-wider mb-3">Parking Date</p>
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className="w-full flex items-center gap-3 p-3 bg-secondary rounded-xl">
-                  <CalendarIcon className="w-5 h-5 text-primary" />
-                  <span className="text-body font-semibold text-foreground">{format(date, "EEE, dd MMM yyyy")}</span>
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="center">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(d) => d && setDate(d)}
-                  disabled={(d) => isBefore(d, new Date(now.getFullYear(), now.getMonth(), now.getDate()))}
-                  className={cn("p-3 pointer-events-auto")}
-                />
-              </PopoverContent>
-            </Popover>
+            <p className="text-caption font-semibold text-muted-foreground uppercase tracking-wider mb-3">Start Date & Time</p>
+            <div className="flex items-center gap-3">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="flex-1 flex items-center gap-2 p-3 bg-secondary rounded-xl">
+                    <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
+                    <span className="text-body-sm font-semibold text-foreground">{format(startDate, "dd MMM yyyy")}</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={(d) => {
+                      if (!d) return;
+                      setStartDate(d);
+                      if (isBefore(endDate, d)) setEndDate(d);
+                    }}
+                    disabled={(d) => isBefore(d, new Date(now.getFullYear(), now.getMonth(), now.getDate()))}
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+              <TimeSelector label="" value={startTime} onChange={setStartTime} />
+            </div>
           </motion.div>
 
-          {/* Time pickers */}
+          {/* End date & time */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             className="bg-card border border-border rounded-2xl p-5"
           >
-            <p className="text-caption font-semibold text-muted-foreground uppercase tracking-wider mb-3">Parking Time</p>
-            <div className="flex items-center justify-center gap-6">
-              <TimeSelector label="START" value={startTime} onChange={setStartTime} />
-              <div className="flex flex-col items-center gap-1 pt-5">
-                <span className="text-muted-foreground font-bold">→</span>
-                <span className="text-caption text-primary font-semibold">{durationText}</span>
-              </div>
-              <TimeSelector label="END" value={endTime} onChange={setEndTime} />
+            <p className="text-caption font-semibold text-muted-foreground uppercase tracking-wider mb-3">End Date & Time</p>
+            <div className="flex items-center gap-3">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="flex-1 flex items-center gap-2 p-3 bg-secondary rounded-xl">
+                    <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
+                    <span className="text-body-sm font-semibold text-foreground">{format(endDate, "dd MMM yyyy")}</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={(d) => d && setEndDate(d)}
+                    disabled={(d) => isBefore(d, startDate)}
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+              <TimeSelector label="" value={endTime} onChange={setEndTime} />
             </div>
+            <p className="mt-3 text-caption text-primary font-semibold text-center">Duration: {durationText}</p>
           </motion.div>
 
           {/* Price breakdown */}
