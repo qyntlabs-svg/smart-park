@@ -3,20 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ChevronLeft, ChevronRight, Car, CreditCard, Clock,
-  Bell, HelpCircle, FileText, Info, LogOut, User, Heart
+  Bell, HelpCircle, FileText, Info, LogOut, User, Heart, Moon
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { useDarkMode } from "@/hooks/use-dark-mode";
 
 const ProfileScreen = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState(true);
   const [showLogout, setShowLogout] = useState(false);
+  const { isDark, toggle: toggleDark } = useDarkMode();
 
   const menuItems = [
     { icon: Car, label: "My Vehicles", action: () => navigate("/vehicles") },
     { icon: CreditCard, label: "Payment Methods", badge: "Coming Soon" },
     { icon: Clock, label: "Booking History", badge: "Coming Soon" },
-    { icon: Bell, label: "Notifications", toggle: true },
+    { icon: Bell, label: "Notifications", toggle: true, checked: notifications, onToggle: setNotifications },
+    { icon: Moon, label: "Dark Mode", toggle: true, checked: isDark, onToggle: () => toggleDark() },
     { icon: HelpCircle, label: "Help & Support", action: () => {} },
     { icon: FileText, label: "Terms & Privacy", action: () => {} },
     { icon: Info, label: "About", action: () => {} },
@@ -80,7 +83,7 @@ const ProfileScreen = () => {
                 </span>
               )}
               {item.toggle && (
-                <Switch checked={notifications} onCheckedChange={setNotifications} />
+                <Switch checked={item.checked} onCheckedChange={item.onToggle} />
               )}
               {!item.badge && !item.toggle && !item.destructive && (
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
