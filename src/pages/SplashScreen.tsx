@@ -8,13 +8,9 @@ const SplashScreen = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      // Check if user has seen onboarding
       const hasSeenOnboarding = localStorage.getItem("hasSeenOnboarding");
-
-      // TODO: Check Supabase auth session when connected
-      // For now, route to onboarding or login
       if (hasSeenOnboarding === "true") {
-        navigate("/login", { replace: true });
+        navigate("/role-select", { replace: true });
       } else {
         navigate("/onboarding", { replace: true });
       }

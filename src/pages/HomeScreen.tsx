@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Menu, Bell, User, MapPin, RefreshCw, ChevronDown,
-  Car, Navigation, Map, List
+  Car, Navigation, Map, List, ClipboardList
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
@@ -45,6 +45,12 @@ const HomeScreen = () => {
           <span className="text-body font-bold text-foreground">Auto Doc</span>
         </div>
         <div className="flex items-center gap-1">
+          <button
+            onClick={() => navigate("/booking-history")}
+            className="touch-target flex items-center justify-center"
+          >
+            <ClipboardList className="w-5 h-5 text-foreground" />
+          </button>
           <button className="touch-target flex items-center justify-center">
             <Bell className="w-5 h-5 text-foreground" />
           </button>
