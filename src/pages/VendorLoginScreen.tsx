@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Store, Phone } from "lucide-react";
+import { ArrowLeft, Store, Phone, Mail } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { Input } from "@/components/ui/input";
 
@@ -10,7 +10,6 @@ const VendorLoginScreen = () => {
   const [phone, setPhone] = useState("");
 
   const handleLogin = () => {
-    // Mock login – go straight to vendor dashboard
     localStorage.setItem("vendorLoggedIn", "true");
     navigate("/vendor/dashboard", { replace: true });
   };
@@ -35,7 +34,7 @@ const VendorLoginScreen = () => {
             <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               type="tel"
-              placeholder="Enter phone number"
+              placeholder="Mobile number or Email"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="pl-12 h-14 rounded-xl text-body"
@@ -44,10 +43,16 @@ const VendorLoginScreen = () => {
         </div>
       </div>
 
-      <div className="px-6 pb-8 pb-safe">
-        <MobileButton fullWidth onClick={handleLogin} disabled={phone.length < 10}>
+      <div className="px-6 pb-8 pb-safe space-y-3">
+        <MobileButton fullWidth onClick={handleLogin} disabled={phone.length < 5}>
           Continue
         </MobileButton>
+        <button
+          onClick={() => navigate("/vendor/register")}
+          className="w-full text-center text-body-sm text-primary font-semibold py-2"
+        >
+          New vendor? Register here →
+        </button>
       </div>
     </div>
   );
