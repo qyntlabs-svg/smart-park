@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 
 import SplashScreen from "./pages/SplashScreen";
 import OnboardingScreen from "./pages/OnboardingScreen";
+import RoleSelectionScreen from "./pages/RoleSelectionScreen";
 import LoginScreen from "./pages/LoginScreen";
 import OtpVerificationScreen from "./pages/OtpVerificationScreen";
 import AddVehicleScreen from "./pages/AddVehicleScreen";
@@ -18,6 +19,12 @@ import BookingSummaryScreen from "./pages/BookingSummaryScreen";
 import SelectionSuccessScreen from "./pages/SelectionSuccessScreen";
 import MyVehiclesScreen from "./pages/MyVehiclesScreen";
 import ProfileScreen from "./pages/ProfileScreen";
+import UpiPaymentScreen from "./pages/UpiPaymentScreen";
+import BookingQrScreen from "./pages/BookingQrScreen";
+import BookingHistoryScreen from "./pages/BookingHistoryScreen";
+import VendorLoginScreen from "./pages/VendorLoginScreen";
+import VendorDashboardScreen from "./pages/VendorDashboardScreen";
+import VendorScanScreen from "./pages/VendorScanScreen";
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -36,6 +43,8 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<SplashScreen />} />
         <Route path="/onboarding" element={<OnboardingScreen />} />
+        <Route path="/role-select" element={<RoleSelectionScreen />} />
+        {/* Consumer routes */}
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/verify-otp" element={<OtpVerificationScreen />} />
         <Route path="/add-vehicle" element={<AddVehicleScreen />} />
@@ -44,8 +53,15 @@ const AnimatedRoutes = () => {
         <Route path="/parking/:id/slots" element={<SlotSelectionScreen />} />
         <Route path="/booking-summary" element={<BookingSummaryScreen />} />
         <Route path="/selection-success" element={<SelectionSuccessScreen />} />
+        <Route path="/upi-payment" element={<UpiPaymentScreen />} />
+        <Route path="/booking-qr" element={<BookingQrScreen />} />
+        <Route path="/booking-history" element={<BookingHistoryScreen />} />
         <Route path="/vehicles" element={<MyVehiclesScreen />} />
         <Route path="/profile" element={<ProfileScreen />} />
+        {/* Vendor routes */}
+        <Route path="/vendor/login" element={<VendorLoginScreen />} />
+        <Route path="/vendor/dashboard" element={<VendorDashboardScreen />} />
+        <Route path="/vendor/scan" element={<VendorScanScreen />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>

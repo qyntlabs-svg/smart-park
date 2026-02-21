@@ -82,16 +82,13 @@ const BookingSummaryScreen = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      navigate("/selection-success", {
+      navigate("/upi-payment", {
         replace: true,
         state: {
-          slotNumber,
-          startDate: format(startDate, "PPP"),
-          endDate: format(endDate, "PPP"),
-          startTime: formatTime12(startTime),
-          endTime: formatTime12(endTime),
+          slot: slotNumber,
+          parking: "Phoenix Mall Parking",
+          price: totalPrice,
           duration: durationText,
-          totalPrice,
         },
       });
     }, 800);
@@ -274,11 +271,8 @@ const BookingSummaryScreen = () => {
         {/* Confirm button */}
         <div className="px-4 pb-4 pb-safe bg-background">
           <MobileButton fullWidth loading={loading} onClick={handleConfirm}>
-            Confirm Selection
+            Proceed to Payment
           </MobileButton>
-          <p className="mt-2 text-caption text-muted-foreground text-center italic">
-            → Ready for Phase 2: Payment
-          </p>
         </div>
       </div>
     </PageTransition>
