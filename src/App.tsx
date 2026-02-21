@@ -23,6 +23,10 @@ import UpiPaymentScreen from "./pages/UpiPaymentScreen";
 import BookingQrScreen from "./pages/BookingQrScreen";
 import BookingHistoryScreen from "./pages/BookingHistoryScreen";
 import VendorLoginScreen from "./pages/VendorLoginScreen";
+import VendorRegisterScreen from "./pages/VendorRegisterScreen";
+import VendorKycScreen from "./pages/VendorKycScreen";
+import VendorPendingScreen from "./pages/VendorPendingScreen";
+import VendorSetupScreen from "./pages/VendorSetupScreen";
 import VendorDashboardScreen from "./pages/VendorDashboardScreen";
 import VendorScanScreen from "./pages/VendorScanScreen";
 
@@ -60,6 +64,10 @@ const AnimatedRoutes = () => {
         <Route path="/profile" element={<ProfileScreen />} />
         {/* Vendor routes */}
         <Route path="/vendor/login" element={<VendorLoginScreen />} />
+        <Route path="/vendor/register" element={<VendorRegisterScreen />} />
+        <Route path="/vendor/kyc" element={<VendorKycScreen />} />
+        <Route path="/vendor/pending" element={<VendorPendingScreen />} />
+        <Route path="/vendor/setup" element={<VendorSetupScreen />} />
         <Route path="/vendor/dashboard" element={<VendorDashboardScreen />} />
         <Route path="/vendor/scan" element={<VendorScanScreen />} />
         <Route path="*" element={<NotFound />} />
