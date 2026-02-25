@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Store, Phone, Mail } from "lucide-react";
+import { ArrowLeft, Phone } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { Input } from "@/components/ui/input";
 
@@ -23,8 +24,8 @@ const VendorLoginScreen = () => {
       </header>
 
       <div className="flex-1 px-6 pt-8">
-        <div className="w-16 h-16 rounded-2xl bg-success/10 flex items-center justify-center mb-6">
-          <Store className="w-8 h-8 text-success" />
+        <div className="w-16 h-16 rounded-2xl overflow-hidden mb-6">
+          <img src={logo} alt="Auto Doc logo" className="w-full h-full object-contain" />
         </div>
         <h1 className="text-heading-lg text-foreground">Vendor Login</h1>
         <p className="mt-2 text-body-sm text-muted-foreground">Sign in to manage your parking facility</p>

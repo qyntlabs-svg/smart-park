@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Car, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { Input } from "@/components/ui/input";
 
@@ -40,9 +41,9 @@ const LoginScreen = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
-          className="mt-16 flex items-center justify-center w-20 h-20 rounded-2xl bg-primary shadow-lg shadow-primary/25"
+          className="mt-16 w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-primary/25"
         >
-          <Car className="w-10 h-10 text-primary-foreground" strokeWidth={1.5} />
+          <img src={logo} alt="Auto Doc logo" className="w-full h-full object-contain" />
         </motion.div>
 
         <motion.h1
