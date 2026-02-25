@@ -10,7 +10,7 @@ const roles = [
     desc: "Find & book parking spots near you",
     icon: Car,
     route: "/login",
-    gradient: "from-primary to-[hsl(217,91%,45%)]",
+    gradient: "from-primary to-[hsl(4,90%,48%)]",
   },
   {
     key: "vendor",

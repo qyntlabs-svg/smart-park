@@ -35,7 +35,7 @@ const ProfileScreen = () => {
   return (
     <div className="min-h-[100dvh] w-full max-w-md mx-auto bg-background flex flex-col">
       {/* Header gradient */}
-      <div className="relative bg-gradient-to-br from-primary to-[hsl(217,91%,45%)] pt-safe">
+      <div className="relative bg-gradient-to-br from-primary to-[hsl(4,90%,48%)] pt-safe">
         {/* Back button */}
         <div className="flex items-center h-[60px] px-4">
           <button onClick={() => navigate(-1)} className="touch-target flex items-center justify-center -ml-2">

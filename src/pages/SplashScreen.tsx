@@ -20,7 +20,7 @@ const SplashScreen = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center bg-gradient-to-br from-primary via-primary to-[hsl(217,91%,45%)] relative overflow-hidden">
+    <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center bg-gradient-to-br from-primary via-primary to-[hsl(4,90%,48%)] relative overflow-hidden">
       {/* Subtle background circles */}
       <div className="absolute top-[-20%] right-[-10%] w-[300px] h-[300px] rounded-full bg-primary-foreground/5" />
       <div className="absolute bottom-[-15%] left-[-15%] w-[400px] h-[400px] rounded-full bg-primary-foreground/5" />
