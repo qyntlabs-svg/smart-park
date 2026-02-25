@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Car, Store, ChevronRight } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 
 const roles = [
   {
@@ -36,10 +37,10 @@ const RoleSelectionScreen = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="flex items-center gap-2 mb-2"
+        className="flex items-center gap-3 mb-2"
       >
-        <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center">
-          <Car className="w-6 h-6 text-primary-foreground" />
+        <div className="w-14 h-14 rounded-2xl overflow-hidden">
+          <img src={logo} alt="Auto Doc logo" className="w-full h-full object-contain" />
         </div>
         <span className="text-heading-md text-foreground">Auto Doc</span>
       </motion.div>
