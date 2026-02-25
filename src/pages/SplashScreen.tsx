@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Car } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 
 const SplashScreen = () => {
   const navigate = useNavigate();
@@ -30,9 +30,9 @@ const SplashScreen = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="flex items-center justify-center w-[120px] h-[120px] rounded-3xl bg-primary-foreground/15 backdrop-blur-sm shadow-2xl"
+        className="flex items-center justify-center w-[140px] h-[140px] rounded-3xl bg-primary-foreground/15 backdrop-blur-sm shadow-2xl overflow-hidden"
       >
-        <Car className="w-16 h-16 text-primary-foreground" strokeWidth={1.5} />
+        <img src={logo} alt="Auto Doc logo" className="w-[110px] h-[110px] object-contain" />
       </motion.div>
 
       {/* App name */}
