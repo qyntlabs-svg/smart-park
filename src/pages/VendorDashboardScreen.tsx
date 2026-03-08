@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ScanLine, Car, Clock, CheckCircle2, LogOut, Store,
-  Settings2, Download, QrCode, TrendingUp, Calendar
+  Settings2, Download, QrCode, TrendingUp, Calendar, FileText
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
+import VendorInvoiceTab from "@/components/vendor/VendorInvoiceTab";
 
 const MOCK_ACTIVE = [
   { id: "BK003", vehicle: "TN 01 AB 1234", slot: "A-08", entryTime: "10:30 AM", elapsed: "1h 45m" },
@@ -24,7 +25,7 @@ const TOTAL_SLOTS = 20;
 
 const VendorDashboardScreen = () => {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"active" | "completed" | "earnings">("active");
+  const [tab, setTab] = useState<"active" | "completed" | "earnings" | "invoices">("active");
 
   const occupiedSlots = MOCK_ACTIVE.length;
   const availableSlots = TOTAL_SLOTS - occupiedSlots;
@@ -109,7 +110,7 @@ const VendorDashboardScreen = () => {
 
       {/* Tabs */}
       <div className="mx-4 mt-3 flex bg-secondary rounded-xl p-1">
-        {(["active", "completed", "earnings"] as const).map((t) => (
+        {(["active", "completed", "earnings", "invoices"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -117,7 +118,7 @@ const VendorDashboardScreen = () => {
               tab === t ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground"
             }`}
           >
-            {t === "active" ? "Active" : t === "completed" ? "History" : "Earnings"}
+            {t === "active" ? "Active" : t === "completed" ? "History" : t === "earnings" ? "Earnings" : "Invoices"}
           </button>
         ))}
       </div>
@@ -227,6 +228,7 @@ const VendorDashboardScreen = () => {
             </div>
           </motion.div>
         )}
+        {tab === "invoices" && <VendorInvoiceTab />}
       </div>
     </div>
   );
