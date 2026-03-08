@@ -29,6 +29,10 @@ import VendorPendingScreen from "./pages/VendorPendingScreen";
 import VendorSetupScreen from "./pages/VendorSetupScreen";
 import VendorDashboardScreen from "./pages/VendorDashboardScreen";
 import VendorScanScreen from "./pages/VendorScanScreen";
+import EditProfileScreen from "./pages/EditProfileScreen";
+import EditVehicleScreen from "./pages/EditVehicleScreen";
+import MechanicsScreen from "./pages/MechanicsScreen";
+import ShopScreen from "./pages/ShopScreen";
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
