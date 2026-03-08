@@ -17,7 +17,7 @@ const ProfileScreen = () => {
   const menuItems = [
     { icon: Car, label: "My Vehicles", action: () => navigate("/vehicles") },
     { icon: CreditCard, label: "Payment Methods", badge: "Coming Soon" },
-    { icon: Clock, label: "Booking History", badge: "Coming Soon" },
+    { icon: Clock, label: "Booking History", action: () => navigate("/booking-history") },
     { icon: Bell, label: "Notifications", toggle: true, checked: notifications, onToggle: setNotifications },
     { icon: Moon, label: "Dark Mode", toggle: true, checked: isDark, onToggle: () => toggleDark() },
     { icon: HelpCircle, label: "Help & Support", action: () => {} },
