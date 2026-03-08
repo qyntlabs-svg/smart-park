@@ -33,6 +33,11 @@ import EditProfileScreen from "./pages/EditProfileScreen";
 import EditVehicleScreen from "./pages/EditVehicleScreen";
 import MechanicsScreen from "./pages/MechanicsScreen";
 import ShopScreen from "./pages/ShopScreen";
+import NotificationsScreen from "./pages/NotificationsScreen";
+import HelpSupportScreen from "./pages/HelpSupportScreen";
+import TermsPrivacyScreen from "./pages/TermsPrivacyScreen";
+import AboutScreen from "./pages/AboutScreen";
+import ChangeLocationScreen from "./pages/ChangeLocationScreen";
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
