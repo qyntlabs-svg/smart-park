@@ -110,7 +110,7 @@ const VendorDashboardScreen = () => {
 
       {/* Tabs */}
       <div className="mx-4 mt-3 flex bg-secondary rounded-xl p-1">
-        {(["active", "completed", "earnings"] as const).map((t) => (
+        {(["active", "completed", "earnings", "invoices"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -118,7 +118,7 @@ const VendorDashboardScreen = () => {
               tab === t ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground"
             }`}
           >
-            {t === "active" ? "Active" : t === "completed" ? "History" : "Earnings"}
+            {t === "active" ? "Active" : t === "completed" ? "History" : t === "earnings" ? "Earnings" : "Invoices"}
           </button>
         ))}
       </div>
