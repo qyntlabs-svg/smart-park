@@ -241,6 +241,7 @@ const VendorDashboardScreen = () => {
         )}
         {tab === "invoices" && <VendorInvoiceTab />}
       </div>
+      <VendorSideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </div>
   );
 };
