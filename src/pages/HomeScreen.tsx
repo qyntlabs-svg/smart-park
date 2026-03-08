@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
+import BottomNav from "@/components/BottomNav";
+import SideDrawer from "@/components/SideDrawer";
 
 // Mock parking data
 const MOCK_PARKING = [
@@ -29,6 +31,7 @@ const HomeScreen = () => {
   const navigate = useNavigate();
   const [view, setView] = useState<"map" | "list">("map");
   const [vehicleSheet, setVehicleSheet] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedParking, setSelectedParking] = useState<string | null>(null);
 
   const parking = MOCK_PARKING.find((p) => p.id === selectedParking);
@@ -37,7 +40,7 @@ const HomeScreen = () => {
     <div className="min-h-[100dvh] w-full max-w-md mx-auto bg-background flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between h-[60px] px-4 pt-safe bg-card border-b border-border z-10">
-        <button className="touch-target flex items-center justify-center">
+        <button onClick={() => setDrawerOpen(true)} className="touch-target flex items-center justify-center">
           <Menu className="w-6 h-6 text-foreground" />
         </button>
         <div className="flex items-center gap-1.5">
@@ -115,7 +118,7 @@ const HomeScreen = () => {
       </div>
 
       {/* Map / List area */}
-      <div className="flex-1 relative mt-3 mx-4 mb-4 rounded-2xl overflow-hidden border border-border">
+      <div className="flex-1 relative mt-3 mx-4 mb-20 rounded-2xl overflow-hidden border border-border">
         {view === "map" ? (
           <div className="w-full h-full min-h-[400px] bg-secondary relative">
             {/* Mock map background */}
@@ -255,6 +258,9 @@ const HomeScreen = () => {
           Apply Selection
         </MobileButton>
       </BottomSheet>
+
+      <SideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <BottomNav />
     </div>
   );
 };

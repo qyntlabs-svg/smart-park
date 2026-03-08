@@ -17,7 +17,7 @@ const ProfileScreen = () => {
   const menuItems = [
     { icon: Car, label: "My Vehicles", action: () => navigate("/vehicles") },
     { icon: CreditCard, label: "Payment Methods", badge: "Coming Soon" },
-    { icon: Clock, label: "Booking History", badge: "Coming Soon" },
+    { icon: Clock, label: "Booking History", action: () => navigate("/booking-history") },
     { icon: Bell, label: "Notifications", toggle: true, checked: notifications, onToggle: setNotifications },
     { icon: Moon, label: "Dark Mode", toggle: true, checked: isDark, onToggle: () => toggleDark() },
     { icon: HelpCircle, label: "Help & Support", action: () => {} },
@@ -52,7 +52,10 @@ const ProfileScreen = () => {
           </div>
           <h2 className="mt-4 text-heading-md text-primary-foreground">User</h2>
           <p className="mt-1 text-body-sm text-primary-foreground/80">+91 98765 43210</p>
-          <button className="mt-3 px-5 py-2 rounded-full bg-primary-foreground/20 border border-primary-foreground/30 text-body-sm font-semibold text-primary-foreground">
+           <button
+            onClick={() => navigate("/edit-profile")}
+            className="mt-3 px-5 py-2 rounded-full bg-primary-foreground/20 border border-primary-foreground/30 text-body-sm font-semibold text-primary-foreground"
+          >
             Edit Profile
           </button>
         </div>
