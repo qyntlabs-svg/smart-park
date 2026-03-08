@@ -42,6 +42,12 @@ const VendorDashboardScreen = () => {
         </div>
         <div className="flex items-center gap-1">
           <button
+            onClick={() => navigate("/vendor/pin-map")}
+            className="touch-target flex items-center justify-center"
+          >
+            <MapPin className="w-5 h-5 text-muted-foreground" />
+          </button>
+          <button
             onClick={() => navigate("/vendor/setup")}
             className="touch-target flex items-center justify-center"
           >
