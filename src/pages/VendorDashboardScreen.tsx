@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ScanLine, Car, Clock, CheckCircle2, LogOut, Store,
-  Settings2, Download, QrCode, TrendingUp, Calendar, FileText, MapPin
+  Settings2, Download, QrCode, TrendingUp, Calendar, FileText, MapPin, Menu
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import VendorInvoiceTab from "@/components/vendor/VendorInvoiceTab";
+import VendorSideDrawer from "@/components/vendor/VendorSideDrawer";
 
 const MOCK_ACTIVE = [
   { id: "BK003", vehicle: "TN 01 AB 1234", slot: "A-08", entryTime: "10:30 AM", elapsed: "1h 45m" },
@@ -26,6 +27,7 @@ const TOTAL_SLOTS = 20;
 const VendorDashboardScreen = () => {
   const navigate = useNavigate();
   const [tab, setTab] = useState<"active" | "completed" | "earnings" | "invoices">("active");
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const occupiedSlots = MOCK_ACTIVE.length;
   const availableSlots = TOTAL_SLOTS - occupiedSlots;
@@ -37,6 +39,9 @@ const VendorDashboardScreen = () => {
       {/* Header */}
       <header className="flex items-center justify-between h-[60px] px-4 pt-safe bg-card border-b border-border">
         <div className="flex items-center gap-2">
+          <button onClick={() => setDrawerOpen(true)} className="touch-target flex items-center justify-center">
+            <Menu className="w-6 h-6 text-foreground" />
+          </button>
           <Store className="w-5 h-5 text-success" />
           <span className="text-body font-bold text-foreground">Vendor Panel</span>
         </div>
@@ -236,6 +241,7 @@ const VendorDashboardScreen = () => {
         )}
         {tab === "invoices" && <VendorInvoiceTab />}
       </div>
+      <VendorSideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </div>
   );
 };
