@@ -75,7 +75,7 @@ const HomeScreen = () => {
         <div className="mt-2 flex items-center gap-1.5">
           <MapPin className="w-4 h-4 text-primary" />
           <p className="text-body-sm text-muted-foreground">Tambaram, Chennai</p>
-          <button className="ml-1 text-caption text-primary font-semibold">Change</button>
+          <button onClick={() => navigate("/change-location")} className="ml-1 text-caption text-primary font-semibold">Change</button>
         </div>
       </div>
 
