@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
+import BottomNav from "@/components/BottomNav";
+import SideDrawer from "@/components/SideDrawer";
 
 // Mock parking data
 const MOCK_PARKING = [
