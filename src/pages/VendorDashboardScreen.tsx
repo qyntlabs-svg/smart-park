@@ -25,7 +25,7 @@ const TOTAL_SLOTS = 20;
 
 const VendorDashboardScreen = () => {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"active" | "completed" | "earnings">("active");
+  const [tab, setTab] = useState<"active" | "completed" | "earnings" | "invoices">("active");
 
   const occupiedSlots = MOCK_ACTIVE.length;
   const availableSlots = TOTAL_SLOTS - occupiedSlots;
