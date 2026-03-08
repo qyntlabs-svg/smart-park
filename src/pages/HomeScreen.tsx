@@ -118,7 +118,7 @@ const HomeScreen = () => {
       </div>
 
       {/* Map / List area */}
-      <div className="flex-1 relative mt-3 mx-4 mb-4 rounded-2xl overflow-hidden border border-border">
+      <div className="flex-1 relative mt-3 mx-4 mb-20 rounded-2xl overflow-hidden border border-border">
         {view === "map" ? (
           <div className="w-full h-full min-h-[400px] bg-secondary relative">
             {/* Mock map background */}
