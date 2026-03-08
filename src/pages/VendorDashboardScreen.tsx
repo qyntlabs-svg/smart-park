@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ScanLine, Car, Clock, CheckCircle2, LogOut, Store,
-  Settings2, Download, QrCode, TrendingUp, Calendar, FileText
+  Settings2, Download, QrCode, TrendingUp, Calendar, FileText, MapPin
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import VendorInvoiceTab from "@/components/vendor/VendorInvoiceTab";
@@ -41,6 +41,12 @@ const VendorDashboardScreen = () => {
           <span className="text-body font-bold text-foreground">Vendor Panel</span>
         </div>
         <div className="flex items-center gap-1">
+          <button
+            onClick={() => navigate("/vendor/pin-map")}
+            className="touch-target flex items-center justify-center"
+          >
+            <MapPin className="w-5 h-5 text-muted-foreground" />
+          </button>
           <button
             onClick={() => navigate("/vendor/setup")}
             className="touch-target flex items-center justify-center"
@@ -213,15 +219,15 @@ const VendorDashboardScreen = () => {
 
             {/* Quick actions */}
             <div className="flex gap-3">
-              <button className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
+              <button onClick={() => navigate("/vendor/qr-codes")} className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
                 <QrCode className="w-6 h-6 text-primary" />
                 <span className="text-caption font-semibold text-foreground">QR Codes</span>
               </button>
-              <button className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
+              <button onClick={() => navigate("/vendor/daily-log")} className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
                 <Download className="w-6 h-6 text-primary" />
                 <span className="text-caption font-semibold text-foreground">Daily Log</span>
               </button>
-              <button className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
+              <button onClick={() => navigate("/vendor/reports")} className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
                 <Calendar className="w-6 h-6 text-primary" />
                 <span className="text-caption font-semibold text-foreground">Reports</span>
               </button>

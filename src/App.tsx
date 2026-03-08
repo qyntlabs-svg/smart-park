@@ -29,6 +29,10 @@ import VendorPendingScreen from "./pages/VendorPendingScreen";
 import VendorSetupScreen from "./pages/VendorSetupScreen";
 import VendorDashboardScreen from "./pages/VendorDashboardScreen";
 import VendorScanScreen from "./pages/VendorScanScreen";
+import VendorQrCodesScreen from "./pages/VendorQrCodesScreen";
+import VendorDailyLogScreen from "./pages/VendorDailyLogScreen";
+import VendorReportsScreen from "./pages/VendorReportsScreen";
+import VendorPinMapScreen from "./pages/VendorPinMapScreen";
 import EditProfileScreen from "./pages/EditProfileScreen";
 import EditVehicleScreen from "./pages/EditVehicleScreen";
 import MechanicsScreen from "./pages/MechanicsScreen";
@@ -88,6 +92,10 @@ const AnimatedRoutes = () => {
         <Route path="/vendor/setup" element={<VendorSetupScreen />} />
         <Route path="/vendor/dashboard" element={<VendorDashboardScreen />} />
         <Route path="/vendor/scan" element={<VendorScanScreen />} />
+        <Route path="/vendor/qr-codes" element={<VendorQrCodesScreen />} />
+        <Route path="/vendor/daily-log" element={<VendorDailyLogScreen />} />
+        <Route path="/vendor/reports" element={<VendorReportsScreen />} />
+        <Route path="/vendor/pin-map" element={<VendorPinMapScreen />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
