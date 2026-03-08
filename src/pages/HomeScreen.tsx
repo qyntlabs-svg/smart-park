@@ -40,7 +40,7 @@ const HomeScreen = () => {
     <div className="min-h-[100dvh] w-full max-w-md mx-auto bg-background flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between h-[60px] px-4 pt-safe bg-card border-b border-border z-10">
-        <button className="touch-target flex items-center justify-center">
+        <button onClick={() => setDrawerOpen(true)} className="touch-target flex items-center justify-center">
           <Menu className="w-6 h-6 text-foreground" />
         </button>
         <div className="flex items-center gap-1.5">
