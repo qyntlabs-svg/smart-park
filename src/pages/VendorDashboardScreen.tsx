@@ -39,6 +39,9 @@ const VendorDashboardScreen = () => {
       {/* Header */}
       <header className="flex items-center justify-between h-[60px] px-4 pt-safe bg-card border-b border-border">
         <div className="flex items-center gap-2">
+          <button onClick={() => setDrawerOpen(true)} className="touch-target flex items-center justify-center">
+            <Menu className="w-6 h-6 text-foreground" />
+          </button>
           <Store className="w-5 h-5 text-success" />
           <span className="text-body font-bold text-foreground">Vendor Panel</span>
         </div>
