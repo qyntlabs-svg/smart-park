@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ScanLine, Car, Clock, CheckCircle2, LogOut, Store,
-  Settings2, Download, QrCode, TrendingUp, Calendar, FileText, MapPin
+  Settings2, Download, QrCode, TrendingUp, Calendar, FileText, MapPin, Menu
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import VendorInvoiceTab from "@/components/vendor/VendorInvoiceTab";
+import VendorSideDrawer from "@/components/vendor/VendorSideDrawer";
 
 const MOCK_ACTIVE = [
   { id: "BK003", vehicle: "TN 01 AB 1234", slot: "A-08", entryTime: "10:30 AM", elapsed: "1h 45m" },
