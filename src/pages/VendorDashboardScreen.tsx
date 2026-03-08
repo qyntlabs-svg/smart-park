@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ScanLine, Car, Clock, CheckCircle2, LogOut, Store,
-  Settings2, Download, QrCode, TrendingUp, Calendar, FileText
+  Settings2, Download, QrCode, TrendingUp, Calendar, FileText, MapPin
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import VendorInvoiceTab from "@/components/vendor/VendorInvoiceTab";
