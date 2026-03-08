@@ -43,7 +43,7 @@ const BottomSheet = ({ open, onClose, snapPoints = [0.9], children, className }:
             onDragEnd={handleDragEnd}
             style={{ height: sheetHeight }}
             className={cn(
-              "fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl bg-card shadow-2xl",
+              "fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50 rounded-t-3xl bg-card shadow-2xl",
               "pb-safe",
               className
             )}
