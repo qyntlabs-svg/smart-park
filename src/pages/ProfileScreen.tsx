@@ -62,8 +62,8 @@ const ProfileScreen = () => {
       </div>
 
       {/* Menu content */}
-      <div className="flex-1 -mt-6 bg-background rounded-t-3xl overflow-y-auto scrollbar-hide">
-        <div className="bg-card rounded-t-3xl">
+      <div className="flex-1 -mt-4 bg-background rounded-t-3xl overflow-y-auto scrollbar-hide">
+        <div className="bg-card rounded-t-3xl pt-2">
           {menuItems.map((item, i) => (
             <motion.button
               key={i}
