@@ -31,6 +31,7 @@ const HomeScreen = () => {
   const navigate = useNavigate();
   const [view, setView] = useState<"map" | "list">("map");
   const [vehicleSheet, setVehicleSheet] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedParking, setSelectedParking] = useState<string | null>(null);
 
   const parking = MOCK_PARKING.find((p) => p.id === selectedParking);
