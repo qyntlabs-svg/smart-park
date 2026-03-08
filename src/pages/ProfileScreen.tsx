@@ -20,9 +20,9 @@ const ProfileScreen = () => {
     { icon: Clock, label: "Booking History", action: () => navigate("/booking-history") },
     { icon: Bell, label: "Notifications", toggle: true, checked: notifications, onToggle: setNotifications },
     { icon: Moon, label: "Dark Mode", toggle: true, checked: isDark, onToggle: () => toggleDark() },
-    { icon: HelpCircle, label: "Help & Support", action: () => {} },
-    { icon: FileText, label: "Terms & Privacy", action: () => {} },
-    { icon: Info, label: "About", action: () => {} },
+    { icon: HelpCircle, label: "Help & Support", action: () => navigate("/help-support") },
+    { icon: FileText, label: "Terms & Privacy", action: () => navigate("/terms-privacy") },
+    { icon: Info, label: "About", action: () => navigate("/about") },
     { icon: LogOut, label: "Logout", destructive: true, action: () => setShowLogout(true) },
   ];
 

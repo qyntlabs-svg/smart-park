@@ -33,6 +33,11 @@ import EditProfileScreen from "./pages/EditProfileScreen";
 import EditVehicleScreen from "./pages/EditVehicleScreen";
 import MechanicsScreen from "./pages/MechanicsScreen";
 import ShopScreen from "./pages/ShopScreen";
+import NotificationsScreen from "./pages/NotificationsScreen";
+import HelpSupportScreen from "./pages/HelpSupportScreen";
+import TermsPrivacyScreen from "./pages/TermsPrivacyScreen";
+import AboutScreen from "./pages/AboutScreen";
+import ChangeLocationScreen from "./pages/ChangeLocationScreen";
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -70,6 +75,11 @@ const AnimatedRoutes = () => {
         <Route path="/edit-profile" element={<EditProfileScreen />} />
         <Route path="/mechanics" element={<MechanicsScreen />} />
         <Route path="/shop" element={<ShopScreen />} />
+        <Route path="/notifications" element={<NotificationsScreen />} />
+        <Route path="/help-support" element={<HelpSupportScreen />} />
+        <Route path="/terms-privacy" element={<TermsPrivacyScreen />} />
+        <Route path="/about" element={<AboutScreen />} />
+        <Route path="/change-location" element={<ChangeLocationScreen />} />
         {/* Vendor routes */}
         <Route path="/vendor/login" element={<VendorLoginScreen />} />
         <Route path="/vendor/register" element={<VendorRegisterScreen />} />

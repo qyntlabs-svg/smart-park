@@ -54,8 +54,9 @@ const HomeScreen = () => {
           >
             <ClipboardList className="w-5 h-5 text-foreground" />
           </button>
-          <button className="touch-target flex items-center justify-center">
+          <button onClick={() => navigate("/notifications")} className="touch-target flex items-center justify-center relative">
             <Bell className="w-5 h-5 text-foreground" />
+            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-destructive" />
           </button>
           <button
             onClick={() => navigate("/profile")}
@@ -74,7 +75,7 @@ const HomeScreen = () => {
         <div className="mt-2 flex items-center gap-1.5">
           <MapPin className="w-4 h-4 text-primary" />
           <p className="text-body-sm text-muted-foreground">Tambaram, Chennai</p>
-          <button className="ml-1 text-caption text-primary font-semibold">Change</button>
+          <button onClick={() => navigate("/change-location")} className="ml-1 text-caption text-primary font-semibold">Change</button>
         </div>
       </div>
 
