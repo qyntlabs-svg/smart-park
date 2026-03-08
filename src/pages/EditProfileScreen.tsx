@@ -49,10 +49,18 @@ const EditProfileScreen = () => {
         {/* Avatar */}
         <div className="flex flex-col items-center py-8">
           <div className="relative">
-            <div className="w-[100px] h-[100px] rounded-full bg-primary/10 border-[3px] border-primary shadow-lg flex items-center justify-center">
-              <User className="w-12 h-12 text-primary" />
+            <div className="w-[100px] h-[100px] rounded-full bg-primary/10 border-[3px] border-primary shadow-lg flex items-center justify-center overflow-hidden">
+              {avatar ? (
+                <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-12 h-12 text-primary" />
+              )}
             </div>
-            <button className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center shadow-md border-2 border-background">
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center shadow-md border-2 border-background"
+            >
               <Camera className="w-4 h-4 text-primary-foreground" />
             </button>
           </div>
