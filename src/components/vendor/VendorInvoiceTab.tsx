@@ -233,7 +233,7 @@ const InvoiceDetailView = ({ invoice, onClose }: { invoice: PlatformInvoice; onC
       <MobileButton fullWidth variant="outline" onClick={onClose}>
         Back
       </MobileButton>
-      <MobileButton fullWidth variant="default" className="gap-2">
+      <MobileButton fullWidth variant="primary" className="gap-2">
         <Download className="w-4 h-4" /> Download PDF
       </MobileButton>
     </div>
