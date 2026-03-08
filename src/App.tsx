@@ -65,7 +65,11 @@ const AnimatedRoutes = () => {
         <Route path="/booking-qr" element={<BookingQrScreen />} />
         <Route path="/booking-history" element={<BookingHistoryScreen />} />
         <Route path="/vehicles" element={<MyVehiclesScreen />} />
+        <Route path="/vehicles/:id/edit" element={<EditVehicleScreen />} />
         <Route path="/profile" element={<ProfileScreen />} />
+        <Route path="/edit-profile" element={<EditProfileScreen />} />
+        <Route path="/mechanics" element={<MechanicsScreen />} />
+        <Route path="/shop" element={<ShopScreen />} />
         {/* Vendor routes */}
         <Route path="/vendor/login" element={<VendorLoginScreen />} />
         <Route path="/vendor/register" element={<VendorRegisterScreen />} />

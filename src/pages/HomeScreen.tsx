@@ -258,6 +258,9 @@ const HomeScreen = () => {
           Apply Selection
         </MobileButton>
       </BottomSheet>
+
+      <SideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <BottomNav />
     </div>
   );
 };
