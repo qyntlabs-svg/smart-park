@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronLeft, Camera, User } from "lucide-react";
@@ -10,10 +10,25 @@ import { useToast } from "@/hooks/use-toast";
 const EditProfileScreen = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("User");
   const [phone] = useState("+91 98765 43210");
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("Chennai");
+  const [avatar, setAvatar] = useState<string | null>(null);
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({ title: "File too large", description: "Please select an image under 5MB.", variant: "destructive" });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => setAvatar(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSave = () => {
     toast({ title: "Profile Updated", description: "Your profile has been saved successfully." });
