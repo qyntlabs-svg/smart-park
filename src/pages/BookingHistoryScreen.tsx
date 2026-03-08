@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Clock, CheckCircle2, Car } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle2, Car, QrCode } from "lucide-react";
 
 const MOCK_HISTORY = [
   { id: "BK001", parking: "Phoenix Mall Parking", slot: "A-12", vehicle: "TN 01 AB 1234", date: "2026-02-20", duration: "2h 15m", amount: 90, status: "completed" },
@@ -10,6 +10,21 @@ const MOCK_HISTORY = [
 
 const BookingHistoryScreen = () => {
   const navigate = useNavigate();
+
+  const handleViewQR = (b: typeof MOCK_HISTORY[0]) => {
+    navigate("/booking-qr", {
+      state: {
+        bookingId: b.id,
+        slot: b.slot,
+        parking: b.parking,
+        vehicle: b.vehicle,
+        duration: b.duration,
+        price: b.amount,
+        paidAt: b.date,
+        paymentMethod: "upi",
+      },
+    });
+  };
 
   return (
     <div className="min-h-[100dvh] w-full max-w-md mx-auto bg-background flex flex-col">
@@ -56,9 +71,16 @@ const BookingHistoryScreen = () => {
                 <Car className="w-4 h-4 text-muted-foreground" />
                 <span className="text-caption text-muted-foreground">{b.vehicle}</span>
               </div>
-              <div className="text-right">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleViewQR(b)}
+                  className="flex items-center gap-1 text-caption font-semibold text-primary"
+                >
+                  <QrCode className="w-4 h-4" />
+                  View QR
+                </button>
                 <span className="text-body-sm font-bold text-foreground">₹{b.amount}</span>
-                {b.status === "completed" && <span className="text-caption text-muted-foreground ml-2">{b.duration}</span>}
+                {b.status === "completed" && <span className="text-caption text-muted-foreground">{b.duration}</span>}
               </div>
             </div>
           </motion.div>
