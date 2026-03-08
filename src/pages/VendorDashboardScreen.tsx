@@ -231,6 +231,7 @@ const VendorDashboardScreen = () => {
         {tab === "invoices" && <VendorInvoiceTab />}
       </div>
     </div>
+  );
 };
 
 export default VendorDashboardScreen;
