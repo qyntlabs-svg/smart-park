@@ -54,8 +54,9 @@ const HomeScreen = () => {
           >
             <ClipboardList className="w-5 h-5 text-foreground" />
           </button>
-          <button className="touch-target flex items-center justify-center">
+          <button onClick={() => navigate("/notifications")} className="touch-target flex items-center justify-center relative">
             <Bell className="w-5 h-5 text-foreground" />
+            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-destructive" />
           </button>
           <button
             onClick={() => navigate("/profile")}
