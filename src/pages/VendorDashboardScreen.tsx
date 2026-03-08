@@ -6,6 +6,7 @@ import {
   Settings2, Download, QrCode, TrendingUp, Calendar, FileText
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
+import VendorInvoiceTab from "@/components/vendor/VendorInvoiceTab";
 
 const MOCK_ACTIVE = [
   { id: "BK003", vehicle: "TN 01 AB 1234", slot: "A-08", entryTime: "10:30 AM", elapsed: "1h 45m" },
