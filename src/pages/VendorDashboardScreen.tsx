@@ -228,9 +228,9 @@ const VendorDashboardScreen = () => {
             </div>
           </motion.div>
         )}
+        {tab === "invoices" && <VendorInvoiceTab />}
       </div>
     </div>
-  );
 };
 
 export default VendorDashboardScreen;
