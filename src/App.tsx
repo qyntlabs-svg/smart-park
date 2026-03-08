@@ -92,6 +92,10 @@ const AnimatedRoutes = () => {
         <Route path="/vendor/setup" element={<VendorSetupScreen />} />
         <Route path="/vendor/dashboard" element={<VendorDashboardScreen />} />
         <Route path="/vendor/scan" element={<VendorScanScreen />} />
+        <Route path="/vendor/qr-codes" element={<VendorQrCodesScreen />} />
+        <Route path="/vendor/daily-log" element={<VendorDailyLogScreen />} />
+        <Route path="/vendor/reports" element={<VendorReportsScreen />} />
+        <Route path="/vendor/pin-map" element={<VendorPinMapScreen />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
