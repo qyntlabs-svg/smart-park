@@ -1,23 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Plus, Minus, QrCode, Settings2, DollarSign, Clock, AlertTriangle } from "lucide-react";
+import { ArrowLeft, QrCode, DollarSign, Clock, AlertTriangle, Wallet } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { Input } from "@/components/ui/input";
 import { QRCodeSVG } from "qrcode.react";
 
 const VendorSetupScreen = () => {
   const navigate = useNavigate();
-  const [totalSlots, setTotalSlots] = useState(20);
+  const [totalSlots, setTotalSlots] = useState("20");
   const [slotPrefix, setSlotPrefix] = useState("A");
   const [hourlyRate, setHourlyRate] = useState("40");
   const [dailyRate, setDailyRate] = useState("200");
   const [overstayPenalty, setOverstayPenalty] = useState("50");
+  const [upiId, setUpiId] = useState("");
   const [qrType, setQrType] = useState<"per-slot" | "per-gate">("per-gate");
   const [showQr, setShowQr] = useState(false);
   const [step, setStep] = useState(1); // 1=slots, 2=pricing, 3=qr
 
-  const generatedSlots = Array.from({ length: totalSlots }, (_, i) => `${slotPrefix}-${String(i + 1).padStart(2, "0")}`);
+  const slotCount = Math.max(0, parseInt(totalSlots) || 0);
+  const generatedSlots = Array.from({ length: slotCount }, (_, i) => `${slotPrefix}-${String(i + 1).padStart(2, "0")}`);
 
   const handleFinish = () => {
     localStorage.setItem("vendorSetupDone", "true");
@@ -42,7 +44,7 @@ const VendorSetupScreen = () => {
         </div>
         <p className="mt-2 text-caption text-muted-foreground">
           {step === 1 && "Configure Slots"}
-          {step === 2 && "Set Pricing"}
+          {step === 2 && "Set Pricing & UPI"}
           {step === 3 && "Generate QR Codes"}
         </p>
       </div>
@@ -51,63 +53,51 @@ const VendorSetupScreen = () => {
         {/* Step 1: Slots */}
         {step === 1 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-body font-bold text-foreground">Total Slots</p>
-                <p className="text-caption text-muted-foreground">Number of parking spots</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setTotalSlots(Math.max(1, totalSlots - 1))}
-                  className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center"
-                >
-                  <Minus className="w-4 h-4 text-foreground" />
-                </button>
-                <span className="text-heading-md text-foreground w-12 text-center">{totalSlots}</span>
-                <button
-                  onClick={() => setTotalSlots(totalSlots + 1)}
-                  className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
-                >
-                  <Plus className="w-4 h-4 text-primary-foreground" />
-                </button>
-              </div>
+            <div>
+              <p className="text-body font-bold text-foreground mb-1">Total Slots</p>
+              <p className="text-caption text-muted-foreground mb-2">Enter the number of parking spots</p>
+              <Input
+                type="number"
+                min="1"
+                value={totalSlots}
+                onChange={(e) => setTotalSlots(e.target.value)}
+                placeholder="e.g. 100"
+                className="h-14 rounded-xl text-heading-sm text-center"
+              />
             </div>
 
             <div>
               <p className="text-body-sm font-semibold text-foreground mb-2">Slot Prefix</p>
-              <div className="flex gap-2">
-                {["A", "B", "C", "P"].map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setSlotPrefix(p)}
-                    className={`flex-1 py-3 rounded-xl text-body font-bold transition-all ${
-                      slotPrefix === p ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
+              <p className="text-caption text-muted-foreground mb-2">Type any prefix (e.g. A, B, P, Floor-1)</p>
+              <Input
+                type="text"
+                value={slotPrefix}
+                onChange={(e) => setSlotPrefix(e.target.value.toUpperCase())}
+                placeholder="e.g. A, B, P1"
+                className="h-14 rounded-xl text-heading-sm text-center"
+              />
             </div>
 
             {/* Preview slots */}
-            <div>
-              <p className="text-body-sm font-semibold text-foreground mb-2">Generated Slot IDs</p>
-              <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto scrollbar-hide">
-                {generatedSlots.slice(0, 30).map((s) => (
-                  <span key={s} className="px-3 py-1.5 bg-card border border-border rounded-lg text-caption font-semibold text-foreground">
-                    {s}
-                  </span>
-                ))}
-                {totalSlots > 30 && (
-                  <span className="px-3 py-1.5 text-caption text-muted-foreground">+{totalSlots - 30} more</span>
-                )}
+            {slotCount > 0 && (
+              <div>
+                <p className="text-body-sm font-semibold text-foreground mb-2">Generated Slot IDs</p>
+                <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto scrollbar-hide">
+                  {generatedSlots.slice(0, 30).map((s) => (
+                    <span key={s} className="px-3 py-1.5 bg-card border border-border rounded-lg text-caption font-semibold text-foreground">
+                      {s}
+                    </span>
+                  ))}
+                  {slotCount > 30 && (
+                    <span className="px-3 py-1.5 text-caption text-muted-foreground">+{slotCount - 30} more</span>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </motion.div>
         )}
 
-        {/* Step 2: Pricing */}
+        {/* Step 2: Pricing & UPI */}
         {step === 2 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
             <div>
@@ -115,12 +105,7 @@ const VendorSetupScreen = () => {
                 <DollarSign className="w-4 h-4 text-primary" />
                 <p className="text-body-sm font-semibold text-foreground">Hourly Rate (₹)</p>
               </div>
-              <Input
-                type="number"
-                value={hourlyRate}
-                onChange={(e) => setHourlyRate(e.target.value)}
-                className="h-14 rounded-xl text-heading-sm text-center"
-              />
+              <Input type="number" value={hourlyRate} onChange={(e) => setHourlyRate(e.target.value)} className="h-14 rounded-xl text-heading-sm text-center" />
             </div>
 
             <div>
@@ -128,12 +113,7 @@ const VendorSetupScreen = () => {
                 <Clock className="w-4 h-4 text-primary" />
                 <p className="text-body-sm font-semibold text-foreground">Daily Rate (₹)</p>
               </div>
-              <Input
-                type="number"
-                value={dailyRate}
-                onChange={(e) => setDailyRate(e.target.value)}
-                className="h-14 rounded-xl text-heading-sm text-center"
-              />
+              <Input type="number" value={dailyRate} onChange={(e) => setDailyRate(e.target.value)} className="h-14 rounded-xl text-heading-sm text-center" />
             </div>
 
             <div>
@@ -141,12 +121,22 @@ const VendorSetupScreen = () => {
                 <AlertTriangle className="w-4 h-4 text-warning" />
                 <p className="text-body-sm font-semibold text-foreground">Overstay Penalty (₹/hr)</p>
               </div>
+              <Input type="number" value={overstayPenalty} onChange={(e) => setOverstayPenalty(e.target.value)} className="h-14 rounded-xl text-heading-sm text-center" />
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Wallet className="w-4 h-4 text-primary" />
+                <p className="text-body-sm font-semibold text-foreground">Your UPI ID (for receiving payments)</p>
+              </div>
               <Input
-                type="number"
-                value={overstayPenalty}
-                onChange={(e) => setOverstayPenalty(e.target.value)}
-                className="h-14 rounded-xl text-heading-sm text-center"
+                type="text"
+                value={upiId}
+                onChange={(e) => setUpiId(e.target.value)}
+                placeholder="yourname@upi"
+                className="h-14 rounded-xl"
               />
+              <p className="mt-1 text-caption text-muted-foreground">Customers paying via UPI will pay to this ID</p>
             </div>
 
             <div className="p-4 bg-card border border-border rounded-2xl">
@@ -164,6 +154,12 @@ const VendorSetupScreen = () => {
                   <span className="text-body-sm text-muted-foreground">Overstay</span>
                   <span className="text-body-sm font-bold text-warning">₹{overstayPenalty}/hr extra</span>
                 </div>
+                {upiId && (
+                  <div className="flex justify-between">
+                    <span className="text-body-sm text-muted-foreground">UPI</span>
+                    <span className="text-body-sm font-bold text-primary">{upiId}</span>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
@@ -194,33 +190,21 @@ const VendorSetupScreen = () => {
               </div>
             </div>
 
-            {/* QR Preview */}
             <div className="flex flex-col items-center">
-              <button
-                onClick={() => setShowQr(!showQr)}
-                className="text-body-sm text-primary font-semibold mb-4"
-              >
+              <button onClick={() => setShowQr(!showQr)} className="text-body-sm text-primary font-semibold mb-4">
                 {showQr ? "Hide Preview" : "Preview QR Code"}
               </button>
 
               {showQr && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="p-6 bg-card border border-border rounded-3xl"
-                >
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-card border border-border rounded-3xl">
                   <QRCodeSVG
-                    value={JSON.stringify({
-                      vendor: "VENDOR_001",
-                      type: qrType,
-                      slot: qrType === "per-slot" ? "A-01" : "GATE-ENTRY",
-                    })}
+                    value={JSON.stringify({ vendor: "VENDOR_001", type: qrType, slot: qrType === "per-slot" ? `${slotPrefix}-01` : "GATE-ENTRY" })}
                     size={180}
                     level="H"
                     includeMargin
                   />
                   <p className="mt-2 text-caption text-center text-muted-foreground">
-                    {qrType === "per-gate" ? "Gate Entry QR" : "Slot A-01"}
+                    {qrType === "per-gate" ? "Gate Entry QR" : `Slot ${slotPrefix}-01`}
                   </p>
                 </motion.div>
               )}
@@ -234,10 +218,7 @@ const VendorSetupScreen = () => {
       </div>
 
       <div className="px-6 pb-8 pb-safe">
-        <MobileButton
-          fullWidth
-          onClick={step < 3 ? () => setStep(step + 1) : handleFinish}
-        >
+        <MobileButton fullWidth onClick={step < 3 ? () => setStep(step + 1) : handleFinish}>
           {step < 3 ? "Continue" : "Go Live 🚀"}
         </MobileButton>
       </div>
