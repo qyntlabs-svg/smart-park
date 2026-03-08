@@ -213,15 +213,15 @@ const VendorDashboardScreen = () => {
 
             {/* Quick actions */}
             <div className="flex gap-3">
-              <button className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
+              <button onClick={() => navigate("/vendor/qr-codes")} className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
                 <QrCode className="w-6 h-6 text-primary" />
                 <span className="text-caption font-semibold text-foreground">QR Codes</span>
               </button>
-              <button className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
+              <button onClick={() => navigate("/vendor/daily-log")} className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
                 <Download className="w-6 h-6 text-primary" />
                 <span className="text-caption font-semibold text-foreground">Daily Log</span>
               </button>
-              <button className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
+              <button onClick={() => navigate("/vendor/reports")} className="flex-1 flex flex-col items-center gap-2 p-4 bg-card border border-border rounded-2xl">
                 <Calendar className="w-6 h-6 text-primary" />
                 <span className="text-caption font-semibold text-foreground">Reports</span>
               </button>
