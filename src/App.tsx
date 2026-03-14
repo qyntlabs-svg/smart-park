@@ -101,6 +101,7 @@ const AnimatedRoutes = () => {
         <Route path="/vendor/daily-log" element={<VendorDailyLogScreen />} />
         <Route path="/vendor/reports" element={<VendorReportsScreen />} />
         <Route path="/vendor/pin-map" element={<VendorPinMapScreen />} />
+        <Route path="/vendor/monthly-passes" element={<VendorMonthlyPassScreen />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>

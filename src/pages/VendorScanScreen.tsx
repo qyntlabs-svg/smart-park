@@ -24,6 +24,14 @@ type ScanResult = {
 const MOCK_SCENARIOS: ScanResult[] = [
   {
     status: "success-entry",
+    id: "MP-2026-001",
+    slot: "M-05",
+    vehicle: "TN 01 AB 1234",
+    parking: "Phoenix Mall Parking",
+    paymentMethod: "Monthly Pass",
+  },
+  {
+    status: "success-entry",
     id: "BK003",
     slot: "A-08",
     vehicle: "TN 01 AB 1234",
