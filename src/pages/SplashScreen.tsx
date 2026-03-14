@@ -30,9 +30,9 @@ const SplashScreen = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="flex items-center justify-center w-[140px] h-[140px] rounded-3xl bg-primary-foreground/15 backdrop-blur-sm shadow-2xl overflow-hidden"
+        className="flex items-center justify-center w-[140px] h-[140px] rounded-3xl bg-foreground/10 backdrop-blur-sm shadow-2xl overflow-hidden"
       >
-        <img src={logo} alt="Auto Doc logo" className="w-[110px] h-[110px] object-contain" />
+        <img src={logo} alt="Auto Doc logo" className="w-[120px] h-[120px] object-contain" />
       </motion.div>
 
       {/* App name */}
