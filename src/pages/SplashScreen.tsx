@@ -40,7 +40,7 @@ const SplashScreen = () => {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
-        className="mt-6 text-heading-lg text-primary-foreground tracking-tight"
+        className="mt-6 text-heading-lg text-foreground tracking-tight"
       >
         Auto Doc
       </motion.h1>
@@ -50,7 +50,7 @@ const SplashScreen = () => {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5, ease: "easeOut" }}
-        className="mt-2 text-body text-primary-foreground/80"
+        className="mt-2 text-body text-foreground/70"
       >
         Park Smart, Drive Easy
       </motion.p>
