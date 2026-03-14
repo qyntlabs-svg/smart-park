@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Menu, Bell, User, MapPin, RefreshCw, ChevronDown,
-  Car, Navigation, Map, List, ClipboardList
+  Car, Navigation, Map, List, ClipboardList, CalendarCheck
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
@@ -78,6 +78,21 @@ const HomeScreen = () => {
           <button onClick={() => navigate("/change-location")} className="ml-1 text-caption text-primary font-semibold">Change</button>
         </div>
       </div>
+
+      {/* Monthly Pass Banner */}
+      <motion.button
+        whileTap={{ scale: 0.98 }}
+        onClick={() => navigate("/monthly-pass/active")}
+        className="mx-4 mt-3 flex items-center gap-3 p-4 bg-primary/5 border border-primary/20 rounded-2xl"
+      >
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+          <CalendarCheck className="w-5 h-5 text-primary" />
+        </div>
+        <div className="flex-1 text-left">
+          <p className="text-body-sm font-bold text-foreground">Monthly Parking Pass</p>
+          <p className="text-caption text-muted-foreground">Get unlimited access from ₹1,500/mo</p>
+        </div>
+      </motion.button>
 
       {/* Vehicle selector */}
       <motion.button

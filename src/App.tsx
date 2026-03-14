@@ -42,6 +42,9 @@ import HelpSupportScreen from "./pages/HelpSupportScreen";
 import TermsPrivacyScreen from "./pages/TermsPrivacyScreen";
 import AboutScreen from "./pages/AboutScreen";
 import ChangeLocationScreen from "./pages/ChangeLocationScreen";
+import MonthlyPassScreen from "./pages/MonthlyPassScreen";
+import ActivePassScreen from "./pages/ActivePassScreen";
+import VendorMonthlyPassScreen from "./pages/VendorMonthlyPassScreen";
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -84,6 +87,8 @@ const AnimatedRoutes = () => {
         <Route path="/terms-privacy" element={<TermsPrivacyScreen />} />
         <Route path="/about" element={<AboutScreen />} />
         <Route path="/change-location" element={<ChangeLocationScreen />} />
+        <Route path="/monthly-pass" element={<MonthlyPassScreen />} />
+        <Route path="/monthly-pass/active" element={<ActivePassScreen />} />
         {/* Vendor routes */}
         <Route path="/vendor/login" element={<VendorLoginScreen />} />
         <Route path="/vendor/register" element={<VendorRegisterScreen />} />
@@ -96,6 +101,7 @@ const AnimatedRoutes = () => {
         <Route path="/vendor/daily-log" element={<VendorDailyLogScreen />} />
         <Route path="/vendor/reports" element={<VendorReportsScreen />} />
         <Route path="/vendor/pin-map" element={<VendorPinMapScreen />} />
+        <Route path="/vendor/monthly-passes" element={<VendorMonthlyPassScreen />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ScanLine, Car, Clock, CheckCircle2, LogOut, Store,
-  Settings2, Download, QrCode, TrendingUp, Calendar, FileText, MapPin, Menu
+  Settings2, Download, QrCode, TrendingUp, Calendar, FileText, MapPin, Menu, CalendarCheck
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import VendorInvoiceTab from "@/components/vendor/VendorInvoiceTab";
@@ -117,6 +117,23 @@ const VendorDashboardScreen = () => {
             <p className="text-caption text-muted-foreground mt-0.5">{s.label}</p>
           </div>
         ))}
+      </div>
+
+      {/* Monthly Pass Quick Link */}
+      <div className="px-4 pt-3">
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={() => navigate("/vendor/monthly-passes")}
+          className="w-full flex items-center gap-3 p-4 bg-primary/5 border border-primary/20 rounded-2xl"
+        >
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <CalendarCheck className="w-5 h-5 text-primary" />
+          </div>
+          <div className="flex-1 text-left">
+            <p className="text-body-sm font-bold text-foreground">Monthly Pass Management</p>
+            <p className="text-caption text-muted-foreground">View holders, configure passes</p>
+          </div>
+        </motion.button>
       </div>
 
       {/* Tabs */}
