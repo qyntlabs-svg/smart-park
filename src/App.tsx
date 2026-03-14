@@ -42,6 +42,9 @@ import HelpSupportScreen from "./pages/HelpSupportScreen";
 import TermsPrivacyScreen from "./pages/TermsPrivacyScreen";
 import AboutScreen from "./pages/AboutScreen";
 import ChangeLocationScreen from "./pages/ChangeLocationScreen";
+import MonthlyPassScreen from "./pages/MonthlyPassScreen";
+import ActivePassScreen from "./pages/ActivePassScreen";
+import VendorMonthlyPassScreen from "./pages/VendorMonthlyPassScreen";
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
