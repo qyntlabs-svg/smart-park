@@ -47,7 +47,7 @@
     --sidebar-accent: 0 20% 96%;
     --sidebar-accent-foreground: 0 0% 10%;
     --sidebar-border: 0 10% 90%;
-    --sidebar-ring: 4 90% 58%;
+    --sidebar-ring: 45 100% 50%;
 
     /* Safe area insets for mobile */
     --safe-area-top: env(safe-area-inset-top, 0px);
