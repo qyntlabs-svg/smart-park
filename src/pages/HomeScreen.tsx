@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Menu, Bell, User, MapPin, RefreshCw, ChevronDown,
-  Car, Navigation, Map, List, ClipboardList
+  Car, Navigation, Map, List, ClipboardList, CalendarCheck
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
