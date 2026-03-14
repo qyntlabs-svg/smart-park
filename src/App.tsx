@@ -87,6 +87,8 @@ const AnimatedRoutes = () => {
         <Route path="/terms-privacy" element={<TermsPrivacyScreen />} />
         <Route path="/about" element={<AboutScreen />} />
         <Route path="/change-location" element={<ChangeLocationScreen />} />
+        <Route path="/monthly-pass" element={<MonthlyPassScreen />} />
+        <Route path="/monthly-pass/active" element={<ActivePassScreen />} />
         {/* Vendor routes */}
         <Route path="/vendor/login" element={<VendorLoginScreen />} />
         <Route path="/vendor/register" element={<VendorRegisterScreen />} />
