@@ -82,7 +82,7 @@ const SplashScreen = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="absolute bottom-8 pb-safe text-caption text-primary-foreground/50"
+        className="absolute bottom-8 pb-safe text-caption text-foreground/50"
       >
         v1.0.0
       </motion.p>
