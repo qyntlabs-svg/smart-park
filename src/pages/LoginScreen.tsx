@@ -41,17 +41,17 @@ const LoginScreen = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
-          className="mt-16 w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-primary/25"
-        >
-          <img src={logo} alt="Auto Doc logo" className="w-full h-full object-contain" />
+          className="mt-16 w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-primary/25">
+          
+          <img alt="Auto Doc logo" className="w-full h-full object-contain" src="/lovable-uploads/4c686d88-9c0e-4a2f-9690-c53d0eef41cb.png" />
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="mt-6 text-heading-md text-foreground"
-        >
+          className="mt-6 text-heading-md text-foreground">
+          
           Welcome to Auto Doc
         </motion.h1>
 
@@ -59,8 +59,8 @@ const LoginScreen = () => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="mt-2 text-body-sm text-muted-foreground"
-        >
+          className="mt-2 text-body-sm text-muted-foreground">
+          
           Sign in with your mobile number
         </motion.p>
 
@@ -69,8 +69,8 @@ const LoginScreen = () => {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
-          className="mt-10 w-full bg-card rounded-2xl p-6 shadow-lg border border-border"
-        >
+          className="mt-10 w-full bg-card rounded-2xl p-6 shadow-lg border border-border">
+          
           <label className="text-body-sm font-semibold text-foreground">
             Mobile Number
           </label>
@@ -91,29 +91,29 @@ const LoginScreen = () => {
               value={phone}
               onChange={(e) => formatPhone(e.target.value)}
               className={`h-14 rounded-xl text-body font-medium px-4 ${
-                error ? "border-destructive focus-visible:ring-destructive" : ""
-              }`}
-              autoFocus
-            />
+              error ? "border-destructive focus-visible:ring-destructive" : ""}`
+              }
+              autoFocus />
+            
           </div>
 
-          {error && (
-            <p className="mt-2 text-caption text-destructive">{error}</p>
-          )}
+          {error &&
+          <p className="mt-2 text-caption text-destructive">{error}</p>
+          }
 
-          {!error && phone.length > 0 && !isValid && (
-            <p className="mt-2 text-caption text-muted-foreground">
+          {!error && phone.length > 0 && !isValid &&
+          <p className="mt-2 text-caption text-muted-foreground">
               Enter a valid 10-digit mobile number
             </p>
-          )}
+          }
 
           <MobileButton
             fullWidth
             className="mt-6"
             disabled={!isValid}
             loading={loading}
-            onClick={handleSendOtp}
-          >
+            onClick={handleSendOtp}>
+            
             Send OTP
           </MobileButton>
         </motion.div>
@@ -123,15 +123,15 @@ const LoginScreen = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-8 text-caption text-muted-foreground text-center leading-relaxed px-4"
-        >
+          className="mt-8 text-caption text-muted-foreground text-center leading-relaxed px-4">
+          
           By continuing, you agree to our{" "}
           <span className="text-primary font-medium">Terms of Service</span> &{" "}
           <span className="text-primary font-medium">Privacy Policy</span>
         </motion.p>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default LoginScreen;
