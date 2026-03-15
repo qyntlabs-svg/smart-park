@@ -2,8 +2,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
   X, Car, ClipboardList, Wrench, ShoppingBag,
-  HelpCircle, FileText, Star, Share2, Lock
-} from "lucide-react";
+  HelpCircle, FileText, Star, Share2, Lock } from
+"lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.jpg";
 
@@ -13,16 +13,16 @@ interface SideDrawerProps {
 }
 
 const menuItems = [
-  { icon: ClipboardList, label: "Booking History", route: "/booking-history" },
-  { icon: Car, label: "My Vehicles", route: "/vehicles" },
-  { icon: Wrench, label: "Mechanics", route: "/mechanics", locked: true },
-  { icon: ShoppingBag, label: "Shop", route: "/shop", locked: true },
-  { divider: true },
-  { icon: Star, label: "Rate Us", route: "__rate" },
-  { icon: Share2, label: "Share App", route: "__share" },
-  { icon: HelpCircle, label: "Help & Support", route: "/help-support" },
-  { icon: FileText, label: "Terms & Privacy", route: "/terms-privacy" },
-];
+{ icon: ClipboardList, label: "Booking History", route: "/booking-history" },
+{ icon: Car, label: "My Vehicles", route: "/vehicles" },
+{ icon: Wrench, label: "Mechanics", route: "/mechanics", locked: true },
+{ icon: ShoppingBag, label: "Shop", route: "/shop", locked: true },
+{ divider: true },
+{ icon: Star, label: "Rate Us", route: "__rate" },
+{ icon: Share2, label: "Share App", route: "__share" },
+{ icon: HelpCircle, label: "Help & Support", route: "/help-support" },
+{ icon: FileText, label: "Terms & Privacy", route: "/terms-privacy" }];
+
 
 const SideDrawer = ({ open, onClose }: SideDrawerProps) => {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ const SideDrawer = ({ open, onClose }: SideDrawerProps) => {
       const shareData = {
         title: "Auto Doc - Smart Parking App",
         text: "Find and book parking in seconds! Download Auto Doc now.",
-        url: "https://autodoc.in",
+        url: "https://autodoc.in"
       };
       if (navigator.share) {
         navigator.share(shareData).catch(() => {});
@@ -63,28 +63,28 @@ const SideDrawer = ({ open, onClose }: SideDrawerProps) => {
 
   return (
     <AnimatePresence>
-      {open && (
-        <>
+      {open &&
+      <>
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 z-40 bg-foreground/40 backdrop-blur-sm"
-          />
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="fixed inset-0 z-40 bg-foreground/40 backdrop-blur-sm" />
+        
           <motion.div
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-y-0 left-0 z-50 w-[280px] bg-card shadow-2xl flex flex-col"
-          >
+          initial={{ x: "-100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "-100%" }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className="fixed inset-y-0 left-0 z-50 w-[280px] bg-card shadow-2xl flex flex-col">
+          
             <div className="bg-gradient-to-br from-primary to-[hsl(4,90%,48%)] p-6 pt-safe">
               <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center mt-safe">
                 <X className="w-4 h-4 text-primary-foreground" />
               </button>
               <div className="w-16 h-16 rounded-2xl overflow-hidden bg-primary-foreground/20 shadow-lg">
-                <img src={logo} alt="Auto Doc" className="w-full h-full object-cover" />
+                <img alt="Auto Doc" className="w-full h-full object-cover" src="/lovable-uploads/460b768a-bf30-4543-81db-68fdb9f41cec.png" />
               </div>
               <h2 className="mt-3 text-body font-bold text-primary-foreground">Auto Doc</h2>
               <p className="text-caption text-primary-foreground/70">Your vehicle companion</p>
@@ -92,26 +92,26 @@ const SideDrawer = ({ open, onClose }: SideDrawerProps) => {
 
             <div className="flex-1 overflow-y-auto py-2 scrollbar-hide">
               {menuItems.map((item, i) => {
-                if ('divider' in item && item.divider) {
-                  return <div key={i} className="my-2 mx-4 border-t border-border" />;
-                }
-                const Icon = item.icon!;
-                return (
-                  <button
-                    key={i}
-                    onClick={() => handleItemClick(item)}
-                    className="w-full flex items-center gap-3 h-12 px-6 active:bg-secondary transition-colors"
-                  >
+              if ('divider' in item && item.divider) {
+                return <div key={i} className="my-2 mx-4 border-t border-border" />;
+              }
+              const Icon = item.icon!;
+              return (
+                <button
+                  key={i}
+                  onClick={() => handleItemClick(item)}
+                  className="w-full flex items-center gap-3 h-12 px-6 active:bg-secondary transition-colors">
+                  
                     <Icon className={`w-5 h-5 ${item.locked ? "text-muted-foreground/40" : "text-primary"}`} />
                     <span className={`flex-1 text-body-sm text-left ${item.locked ? "text-muted-foreground/40" : "text-foreground"}`}>{item.label}</span>
-                    {item.locked && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-caption font-bold text-muted-foreground">
+                    {item.locked &&
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-caption font-bold text-muted-foreground">
                         <Lock className="w-3 h-3" /> Soon
                       </span>
-                    )}
-                  </button>
-                );
-              })}
+                  }
+                  </button>);
+
+            })}
             </div>
 
             <div className="p-4 border-t border-border">
@@ -119,9 +119,9 @@ const SideDrawer = ({ open, onClose }: SideDrawerProps) => {
             </div>
           </motion.div>
         </>
-      )}
-    </AnimatePresence>
-  );
+      }
+    </AnimatePresence>);
+
 };
 
 export default SideDrawer;
