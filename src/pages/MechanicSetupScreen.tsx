@@ -78,7 +78,7 @@ const MechanicSetupScreen = () => {
     arr.forEach((f) => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setPhotos((p) => (p.length < 5 ? [...p, String(e.target?.result ?? "")] : p));
+        setPhotos((p) => (p.length < 10 ? [...p, String(e.target?.result ?? "")] : p));
       };
       reader.readAsDataURL(f);
     });
@@ -99,7 +99,7 @@ const MechanicSetupScreen = () => {
     if (categories.length === 0) return toast.error("Select at least one vehicle category");
     if (services.length === 0) return toast.error("Add at least one service");
     if (services.some((s) => !s.price || s.price <= 0)) return toast.error("All services need a price");
-    if (photos.length < 5) return toast.error("Upload all 5 shop photos");
+    if (photos.length < 2) return toast.error("Upload at least 2 shop photos");
 
     setMechanicShop({
       id: auth.id,
@@ -237,7 +237,9 @@ const MechanicSetupScreen = () => {
 
         {/* Photos */}
         <section>
-          <h2 className="text-body font-bold text-foreground mb-3">Shop Photos ({photos.length}/5)</h2>
+          <h2 className="text-body font-bold text-foreground mb-3">
+            Shop Photos ({photos.length} added · min 2)
+          </h2>
           <input ref={fileInput} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handlePhotos(e.target.files)} />
           <div className="grid grid-cols-3 gap-2">
             {photos.map((p, i) => (
@@ -251,7 +253,7 @@ const MechanicSetupScreen = () => {
                 </button>
               </div>
             ))}
-            {photos.length < 5 && (
+            {photos.length < 10 && (
               <button
                 onClick={() => fileInput.current?.click()}
                 className="aspect-square rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground gap-1"
