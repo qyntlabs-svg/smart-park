@@ -426,6 +426,21 @@ const AnimatedRoutes = () => {
             </ProtectedRoute>
           }
         />
+        {/* Mechanic routes (self-contained local auth) */}
+        <Route path="/mechanic/login" element={<MechanicLoginScreen />} />
+        <Route path="/mechanic/register" element={<MechanicRegisterScreen />} />
+        <Route path="/mechanic/kyc" element={<MechanicKycScreen />} />
+        <Route path="/mechanic/pending" element={<MechanicPendingScreen />} />
+        <Route path="/mechanic/setup" element={<MechanicSetupScreen />} />
+        <Route path="/mechanic/dashboard" element={<MechanicDashboardScreen />} />
+        <Route
+          path="/mechanics/:id"
+          element={
+            <ProtectedRoute role="user">
+              <MechanicShopDetailScreen />
+            </ProtectedRoute>
+          }
+        />
         {/* Admin routes */}
         <Route
           path="/admin/dashboard"
