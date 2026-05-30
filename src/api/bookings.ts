@@ -12,8 +12,16 @@ export interface Booking {
   end_time: string;
   base_amount: number;
   total_amount: number;
-  status: "pending" | "active" | "completed" | "cancelled";
-  payment_status: "pending" | "paid" | "refunded";
+  status:
+    | "pending"
+    | "pending_payment"
+    | "confirmed"
+    | "active"
+    | "completed"
+    | "cancelled"
+    | "failed"
+    | "expired";
+  payment_status: "pending" | "paid" | "refunded" | "failed";
   created_at: string;
   facility_name?: string;
   slot_number?: string;
