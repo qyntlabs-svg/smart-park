@@ -12,6 +12,7 @@ export interface PartnerDashboard {
   today_revenue: number;
   today_bookings: number;
   active_bookings: number;
+  completed_today?: number;
 }
 
 export interface PartnerBooking {
@@ -69,7 +70,18 @@ export const usePartnerDailyLog = (date?: string, status?: string) =>
     queryKey: ["partner-daily-log", date, status],
     queryFn: () =>
       api
-        .get<{ success: boolean; data: PartnerBooking[] }>(
+        .get<{
+          success: boolean;
+          data: {
+            entries: PartnerBooking[];
+            summary: {
+              total_sessions: number;
+              active: number;
+              completed: number;
+              total_revenue: number;
+            };
+          };
+        }>(
           "/partner/bookings/daily-log",
           {
             params: { date, status },
@@ -106,7 +118,10 @@ export const usePartnerQrCodes = () =>
     queryKey: ["partner-qr"],
     queryFn: () =>
       api
-        .get<{ success: boolean; data: any[] }>("/partner/qr")
+        .get<{
+          success: boolean;
+          data: { qr_codes: any[]; qr_type: "per_gate" | "per_slot" };
+        }>("/partner/qr")
         .then((r) => r.data.data),
   });
 
