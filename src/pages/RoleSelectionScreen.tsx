@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Car, Store, ChevronRight } from "lucide-react";
+import { Car, Store, Wrench, ChevronRight } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const roles = [
@@ -18,6 +18,14 @@ const roles = [
     desc: "Manage your parking facility",
     icon: Store,
     route: "/partner/login",
+    gradient: "from-primary to-[hsl(38,100%,40%)]",
+  },
+  {
+    key: "mechanic",
+    label: "Mechanic",
+    desc: "Run your shop & receive bookings",
+    icon: Wrench,
+    route: "/mechanic/login",
     gradient: "from-primary to-[hsl(38,100%,40%)]",
   },
 ] as const;

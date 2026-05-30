@@ -55,6 +55,14 @@ import MonthlyPassScreen from "./pages/MonthlyPassScreen";
 import ActivePassScreen from "./pages/ActivePassScreen";
 import PartnerMonthlyPassScreen from "./pages/PartnerMonthlyPassScreen";
 
+import MechanicLoginScreen from "./pages/MechanicLoginScreen";
+import MechanicRegisterScreen from "./pages/MechanicRegisterScreen";
+import MechanicKycScreen from "./pages/MechanicKycScreen";
+import MechanicPendingScreen from "./pages/MechanicPendingScreen";
+import MechanicSetupScreen from "./pages/MechanicSetupScreen";
+import MechanicDashboardScreen from "./pages/MechanicDashboardScreen";
+import MechanicShopDetailScreen from "./pages/MechanicShopDetailScreen";
+
 import AdminDashboardScreen from "./pages/AdminDashboardScreen";
 import RolePickerScreen from "./pages/RolePickerScreen";
 
@@ -415,6 +423,21 @@ const AnimatedRoutes = () => {
           element={
             <ProtectedRoute>
               <PartnerMonthlyPassScreen />
+            </ProtectedRoute>
+          }
+        />
+        {/* Mechanic routes (self-contained local auth) */}
+        <Route path="/mechanic/login" element={<MechanicLoginScreen />} />
+        <Route path="/mechanic/register" element={<MechanicRegisterScreen />} />
+        <Route path="/mechanic/kyc" element={<MechanicKycScreen />} />
+        <Route path="/mechanic/pending" element={<MechanicPendingScreen />} />
+        <Route path="/mechanic/setup" element={<MechanicSetupScreen />} />
+        <Route path="/mechanic/dashboard" element={<MechanicDashboardScreen />} />
+        <Route
+          path="/mechanics/:id"
+          element={
+            <ProtectedRoute role="user">
+              <MechanicShopDetailScreen />
             </ProtectedRoute>
           }
         />
