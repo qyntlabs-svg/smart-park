@@ -26,6 +26,8 @@ export interface MechanicReview {
   rating: number;
   comment: string;
   date: string;
+  reply?: string;
+  replyDate?: string;
 }
 
 export interface MechanicShop {

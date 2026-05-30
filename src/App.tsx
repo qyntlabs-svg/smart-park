@@ -63,6 +63,7 @@ import MechanicSetupScreen from "./pages/MechanicSetupScreen";
 import MechanicDashboardScreen from "./pages/MechanicDashboardScreen";
 import MechanicShopDetailScreen from "./pages/MechanicShopDetailScreen";
 import MechanicBookingsScreen from "./pages/MechanicBookingsScreen";
+import MechanicReviewsScreen from "./pages/MechanicReviewsScreen";
 
 import AdminDashboardScreen from "./pages/AdminDashboardScreen";
 import RolePickerScreen from "./pages/RolePickerScreen";
@@ -435,6 +436,7 @@ const AnimatedRoutes = () => {
         <Route path="/mechanic/setup" element={<MechanicSetupScreen />} />
         <Route path="/mechanic/dashboard" element={<MechanicDashboardScreen />} />
         <Route path="/mechanic/bookings" element={<MechanicBookingsScreen />} />
+        <Route path="/mechanic/reviews" element={<MechanicReviewsScreen />} />
         <Route
           path="/mechanics/:id"
           element={
