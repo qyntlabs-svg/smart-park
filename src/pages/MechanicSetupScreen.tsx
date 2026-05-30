@@ -20,6 +20,7 @@ const MechanicSetupScreen = () => {
 
   const [shopName, setShopName] = useState("");
   const [address, setAddress] = useState("");
+  const [upiId, setUpiId] = useState("");
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [categories, setCategories] = useState<VehicleCategory[]>([]);
@@ -100,6 +101,7 @@ const MechanicSetupScreen = () => {
     if (services.length === 0) return toast.error("Add at least one service");
     if (services.some((s) => !s.price || s.price <= 0)) return toast.error("All services need a price");
     if (photos.length < 2) return toast.error("Upload at least 2 shop photos");
+    if (!upiId.trim() || !upiId.includes("@")) return toast.error("Enter a valid UPI ID for payments");
 
     setMechanicShop({
       id: auth.id,
@@ -116,6 +118,7 @@ const MechanicSetupScreen = () => {
       reviewCount: 0,
       reviews: [],
       open: true,
+      upiId: upiId.trim(),
     });
     setMechanicAuth({ ...auth, hasSetup: true });
     toast.success("Shop is live!");
@@ -137,6 +140,7 @@ const MechanicSetupScreen = () => {
           <h2 className="text-body font-bold text-foreground mb-3">Shop Details</h2>
           <Input value={shopName} onChange={(e) => setShopName(e.target.value)} placeholder="Shop name" className="h-12 rounded-xl" />
           <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Address" className="h-12 rounded-xl mt-3" />
+          <Input value={upiId} onChange={(e) => setUpiId(e.target.value)} placeholder="UPI ID for payments (e.g. shop@upi)" className="h-12 rounded-xl mt-3" />
           <button onClick={pinLocation} className="mt-3 w-full h-12 rounded-xl border border-dashed border-primary text-primary flex items-center justify-center gap-2 text-body-sm font-semibold">
             <MapPin className="w-4 h-4" />
             {lat != null ? `Pinned (${lat.toFixed(3)}, ${lng?.toFixed(3)})` : "Pin shop location"}
