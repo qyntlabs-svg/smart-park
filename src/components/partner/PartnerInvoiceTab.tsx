@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  FileText, Download, Eye, IndianRupee, Calendar,
-  Building2, Hash, Receipt, ChevronDown, ChevronUp
+  FileText,
+  Download,
+  Eye,
+  IndianRupee,
+  Calendar,
+  Building2,
+  Hash,
+  Receipt,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 
@@ -86,7 +94,11 @@ const formatCurrency = (amount: number) =>
   `₹${amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const formatDate = (dateStr: string) =>
-  new Date(dateStr).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+  new Date(dateStr).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 
 const formatPeriod = (start: string, end: string) =>
   `${new Date(start).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })} – ${new Date(end).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}`;
@@ -98,13 +110,21 @@ const StatusBadge = ({ status }: { status: PlatformInvoice["status"] }) => {
     overdue: "bg-destructive/10 text-destructive",
   };
   return (
-    <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${styles[status]}`}>
+    <span
+      className={`px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${styles[status]}`}
+    >
       {status}
     </span>
   );
 };
 
-const InvoiceDetailView = ({ invoice, onClose }: { invoice: PlatformInvoice; onClose: () => void }) => (
+const InvoiceDetailView = ({
+  invoice,
+  onClose,
+}: {
+  invoice: PlatformInvoice;
+  onClose: () => void;
+}) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -116,13 +136,17 @@ const InvoiceDetailView = ({ invoice, onClose }: { invoice: PlatformInvoice; onC
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Receipt className="w-5 h-5 text-primary" />
-          <span className="text-body font-bold text-foreground">Tax Invoice</span>
+          <span className="text-body font-bold text-foreground">
+            Tax Invoice
+          </span>
         </div>
         <StatusBadge status={invoice.status} />
       </div>
 
       <div className="space-y-1 text-caption text-muted-foreground mb-4">
-        <p className="text-body-sm font-bold text-foreground">{PLATFORM_DETAILS.name}</p>
+        <p className="text-body-sm font-bold text-foreground">
+          {PLATFORM_DETAILS.name}
+        </p>
         <p>GSTIN: {PLATFORM_DETAILS.gstin}</p>
         <p>PAN: {PLATFORM_DETAILS.pan}</p>
         <p>CIN: {PLATFORM_DETAILS.cin}</p>
@@ -138,11 +162,15 @@ const InvoiceDetailView = ({ invoice, onClose }: { invoice: PlatformInvoice; onC
         </div>
         <div>
           <p className="text-muted-foreground">Invoice Date</p>
-          <p className="font-bold text-foreground">{formatDate(invoice.invoiceDate)}</p>
+          <p className="font-bold text-foreground">
+            {formatDate(invoice.invoiceDate)}
+          </p>
         </div>
         <div>
           <p className="text-muted-foreground">Billing Period</p>
-          <p className="font-bold text-foreground">{formatPeriod(invoice.periodStart, invoice.periodEnd)}</p>
+          <p className="font-bold text-foreground">
+            {formatPeriod(invoice.periodStart, invoice.periodEnd)}
+          </p>
         </div>
         <div>
           <p className="text-muted-foreground">SAC Code</p>
@@ -153,46 +181,70 @@ const InvoiceDetailView = ({ invoice, onClose }: { invoice: PlatformInvoice; onC
 
     {/* Line Items */}
     <div className="p-5 bg-card border border-border rounded-2xl">
-      <p className="text-body-sm font-bold text-foreground mb-3">Commission Breakdown</p>
+      <p className="text-body-sm font-bold text-foreground mb-3">
+        Commission Breakdown
+      </p>
 
       <div className="space-y-2.5">
         <div className="flex justify-between text-caption">
-          <span className="text-muted-foreground">Gross Booking Revenue ({invoice.totalSessions} sessions)</span>
-          <span className="font-semibold text-foreground">{formatCurrency(invoice.grossRevenue)}</span>
+          <span className="text-muted-foreground">
+            Gross Booking Revenue ({invoice.totalSessions} sessions)
+          </span>
+          <span className="font-semibold text-foreground">
+            {formatCurrency(invoice.grossRevenue)}
+          </span>
         </div>
 
         <div className="h-px bg-border" />
 
         <div className="flex justify-between text-caption">
-          <span className="text-muted-foreground">Platform Commission @ {invoice.commissionRate}%</span>
-          <span className="font-semibold text-destructive">− {formatCurrency(invoice.commissionAmount)}</span>
+          <span className="text-muted-foreground">
+            Platform Commission @ {invoice.commissionRate}%
+          </span>
+          <span className="font-semibold text-destructive">
+            − {formatCurrency(invoice.commissionAmount)}
+          </span>
         </div>
 
         <div className="flex justify-between text-caption pl-3">
           <span className="text-muted-foreground">CGST @ 9% on Commission</span>
-          <span className="text-muted-foreground">(₹{(invoice.gstOnCommission / 2).toFixed(2)})</span>
+          <span className="text-muted-foreground">
+            (₹{(invoice.gstOnCommission / 2).toFixed(2)})
+          </span>
         </div>
         <div className="flex justify-between text-caption pl-3">
           <span className="text-muted-foreground">SGST @ 9% on Commission</span>
-          <span className="text-muted-foreground">(₹{(invoice.gstOnCommission / 2).toFixed(2)})</span>
+          <span className="text-muted-foreground">
+            (₹{(invoice.gstOnCommission / 2).toFixed(2)})
+          </span>
         </div>
         <div className="flex justify-between text-caption pl-3">
-          <span className="text-muted-foreground">Total GST (18%) on Commission</span>
+          <span className="text-muted-foreground">
+            Total GST (18%) on Commission
+          </span>
           <span className="text-muted-foreground">Included in commission</span>
         </div>
 
         <div className="h-px bg-border" />
 
         <div className="flex justify-between text-caption">
-          <span className="text-muted-foreground">TDS Deducted u/s 194H @ 2%</span>
-          <span className="font-semibold text-destructive">− {formatCurrency(invoice.tdsDeducted)}</span>
+          <span className="text-muted-foreground">
+            TDS Deducted u/s 194H @ 2%
+          </span>
+          <span className="font-semibold text-destructive">
+            − {formatCurrency(invoice.tdsDeducted)}
+          </span>
         </div>
 
         <div className="h-px bg-border" />
 
         <div className="flex justify-between text-body-sm pt-1">
-          <span className="font-bold text-foreground">Net Payable to Vendor</span>
-          <span className="font-bold text-success">{formatCurrency(invoice.netPayable)}</span>
+          <span className="font-bold text-foreground">
+            Net Payable to Partner
+          </span>
+          <span className="font-bold text-success">
+            {formatCurrency(invoice.netPayable)}
+          </span>
         </div>
       </div>
     </div>
@@ -202,16 +254,22 @@ const InvoiceDetailView = ({ invoice, onClose }: { invoice: PlatformInvoice; onC
       <div className="p-4 bg-success/5 border border-success/20 rounded-2xl">
         <div className="flex items-center gap-2 mb-2">
           <IndianRupee className="w-4 h-4 text-success" />
-          <span className="text-caption font-bold text-success">Payment Settled</span>
+          <span className="text-caption font-bold text-success">
+            Payment Settled
+          </span>
         </div>
         <div className="grid grid-cols-2 gap-2 text-caption">
           <div>
             <p className="text-muted-foreground">Settlement Date</p>
-            <p className="font-semibold text-foreground">{formatDate(invoice.paymentDate!)}</p>
+            <p className="font-semibold text-foreground">
+              {formatDate(invoice.paymentDate!)}
+            </p>
           </div>
           <div>
             <p className="text-muted-foreground">UTR / Ref</p>
-            <p className="font-semibold text-foreground text-[11px]">{invoice.transactionRef}</p>
+            <p className="font-semibold text-foreground text-[11px]">
+              {invoice.transactionRef}
+            </p>
           </div>
         </div>
       </div>
@@ -220,11 +278,11 @@ const InvoiceDetailView = ({ invoice, onClose }: { invoice: PlatformInvoice; onC
     {/* Legal Note */}
     <div className="p-3 bg-secondary rounded-xl">
       <p className="text-[10px] text-muted-foreground leading-relaxed">
-        This is a computer-generated invoice and does not require a physical signature.
-        Subject to terms of the ParkIt Vendor Agreement. GST is applicable on platform
-        commission as per GST Act, 2017. TDS is deducted at source under Section 194H
-        of the Income Tax Act, 1961. For disputes, contact vendor-support@parkit.in
-        within 30 days of invoice date.
+        This is a computer-generated invoice and does not require a physical
+        signature. Subject to terms of the ParkIt Partner Agreement. GST is
+        applicable on platform commission as per GST Act, 2017. TDS is deducted
+        at source under Section 194H of the Income Tax Act, 1961. For disputes,
+        contact partner-support@parkit.in within 30 days of invoice date.
       </p>
     </div>
 
@@ -240,20 +298,36 @@ const InvoiceDetailView = ({ invoice, onClose }: { invoice: PlatformInvoice; onC
   </motion.div>
 );
 
-const VendorInvoiceTab = () => {
-  const [selectedInvoice, setSelectedInvoice] = useState<PlatformInvoice | null>(null);
+const PartnerInvoiceTab = () => {
+  const [selectedInvoice, setSelectedInvoice] =
+    useState<PlatformInvoice | null>(null);
   const [showSummary, setShowSummary] = useState(true);
 
   if (selectedInvoice) {
-    return <InvoiceDetailView invoice={selectedInvoice} onClose={() => setSelectedInvoice(null)} />;
+    return (
+      <InvoiceDetailView
+        invoice={selectedInvoice}
+        onClose={() => setSelectedInvoice(null)}
+      />
+    );
   }
 
-  const totalCommission = MOCK_INVOICES.reduce((s, i) => s + i.commissionAmount, 0);
+  const totalCommission = MOCK_INVOICES.reduce(
+    (s, i) => s + i.commissionAmount,
+    0,
+  );
   const totalTds = MOCK_INVOICES.reduce((s, i) => s + i.tdsDeducted, 0);
-  const totalPaid = MOCK_INVOICES.filter((i) => i.status === "paid").reduce((s, i) => s + i.netPayable, 0);
+  const totalPaid = MOCK_INVOICES.filter((i) => i.status === "paid").reduce(
+    (s, i) => s + i.netPayable,
+    0,
+  );
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-3"
+    >
       {/* Fiscal Summary */}
       <button
         onClick={() => setShowSummary(!showSummary)}
@@ -262,7 +336,9 @@ const VendorInvoiceTab = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Building2 className="w-4 h-4 text-primary" />
-            <span className="text-body-sm font-bold text-foreground">Fiscal Summary (FY 2025-26)</span>
+            <span className="text-body-sm font-bold text-foreground">
+              Fiscal Summary (FY 2025-26)
+            </span>
           </div>
           {showSummary ? (
             <ChevronUp className="w-4 h-4 text-muted-foreground" />
@@ -271,13 +347,32 @@ const VendorInvoiceTab = () => {
           )}
         </div>
         {showSummary && (
-          <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} className="mt-3 space-y-2">
+          <motion.div
+            initial={{ height: 0 }}
+            animate={{ height: "auto" }}
+            className="mt-3 space-y-2"
+          >
             {[
-              { label: "Total Commission Paid", value: formatCurrency(totalCommission), color: "text-destructive" },
-              { label: "Total TDS Deducted", value: formatCurrency(totalTds), color: "text-warning" },
-              { label: "Total Net Received", value: formatCurrency(totalPaid), color: "text-success" },
+              {
+                label: "Total Commission Paid",
+                value: formatCurrency(totalCommission),
+                color: "text-destructive",
+              },
+              {
+                label: "Total TDS Deducted",
+                value: formatCurrency(totalTds),
+                color: "text-warning",
+              },
+              {
+                label: "Total Net Received",
+                value: formatCurrency(totalPaid),
+                color: "text-success",
+              },
             ].map((row) => (
-              <div key={row.label} className="flex justify-between text-caption">
+              <div
+                key={row.label}
+                className="flex justify-between text-caption"
+              >
                 <span className="text-muted-foreground">{row.label}</span>
                 <span className={`font-bold ${row.color}`}>{row.value}</span>
               </div>
@@ -291,7 +386,9 @@ const VendorInvoiceTab = () => {
 
       {/* Invoice List */}
       <div className="flex items-center justify-between">
-        <span className="text-caption font-semibold text-muted-foreground">All Invoices</span>
+        <span className="text-caption font-semibold text-muted-foreground">
+          All Invoices
+        </span>
         <button className="flex items-center gap-1 text-caption text-primary font-semibold">
           <Download className="w-3.5 h-3.5" /> Export All
         </button>
@@ -312,18 +409,23 @@ const VendorInvoiceTab = () => {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <p className="text-body-sm font-bold text-foreground">{inv.id}</p>
+                <p className="text-body-sm font-bold text-foreground">
+                  {inv.id}
+                </p>
                 <StatusBadge status={inv.status} />
               </div>
               <p className="text-caption text-muted-foreground">
-                {formatPeriod(inv.periodStart, inv.periodEnd)} · {inv.totalSessions} sessions
+                {formatPeriod(inv.periodStart, inv.periodEnd)} ·{" "}
+                {inv.totalSessions} sessions
               </p>
             </div>
             <div className="text-right shrink-0">
               <p className="text-caption text-muted-foreground line-through">
                 {formatCurrency(inv.commissionAmount)}
               </p>
-              <p className="text-body-sm font-bold text-success">{formatCurrency(inv.netPayable)}</p>
+              <p className="text-body-sm font-bold text-success">
+                {formatCurrency(inv.netPayable)}
+              </p>
             </div>
           </div>
         </motion.button>
@@ -332,4 +434,4 @@ const VendorInvoiceTab = () => {
   );
 };
 
-export default VendorInvoiceTab;
+export default PartnerInvoiceTab;

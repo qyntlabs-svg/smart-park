@@ -10,15 +10,15 @@ const roles = [
     desc: "Find & book parking spots near you",
     icon: Car,
     route: "/login",
-    gradient: "from-primary to-[hsl(4,90%,48%)]",
+    gradient: "from-primary to-[hsl(38,100%,40%)]",
   },
   {
-    key: "vendor",
-    label: "Vendor",
+    key: "partner",
+    label: "Partner",
     desc: "Manage your parking facility",
     icon: Store,
-    route: "/vendor/login",
-    gradient: "from-success to-[hsl(160,84%,28%)]",
+    route: "/partner/login",
+    gradient: "from-primary to-[hsl(38,100%,40%)]",
   },
 ] as const;
 
@@ -40,7 +40,11 @@ const RoleSelectionScreen = () => {
         className="flex items-center gap-3 mb-2"
       >
         <div className="w-14 h-14 rounded-2xl overflow-hidden">
-          <img src={logo} alt="Auto Doc logo" className="w-full h-full object-contain" />
+          <img
+            src={logo}
+            alt="Auto Doc logo"
+            className="w-full h-full object-contain"
+          />
         </div>
         <span className="text-heading-md text-foreground">Auto Doc</span>
       </motion.div>
@@ -54,23 +58,25 @@ const RoleSelectionScreen = () => {
         Choose how you'd like to continue
       </motion.p>
 
+      {/* No entry animation on buttons — avoids opacity:0 stuck state on re-navigation */}
       <div className="w-full space-y-4">
-        {roles.map((role, i) => (
+        {roles.map((role) => (
           <motion.button
             key={role.key}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 + i * 0.15 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => selectRole(role)}
             className="w-full flex items-center gap-4 p-5 bg-card border border-border rounded-2xl shadow-sm text-left"
           >
-            <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${role.gradient} flex items-center justify-center shrink-0`}>
+            <div
+              className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${role.gradient} flex items-center justify-center shrink-0`}
+            >
               <role.icon className="w-7 h-7 text-primary-foreground" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-heading-sm text-foreground">{role.label}</p>
-              <p className="text-body-sm text-muted-foreground mt-0.5">{role.desc}</p>
+              <p className="text-body-sm text-muted-foreground mt-0.5">
+                {role.desc}
+              </p>
             </div>
             <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
           </motion.button>
@@ -80,7 +86,7 @@ const RoleSelectionScreen = () => {
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.7 }}
+        transition={{ delay: 0.4 }}
         className="mt-10 text-caption text-muted-foreground text-center"
       >
         You can switch roles anytime from settings

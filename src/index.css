@@ -108,7 +108,11 @@
   }
 
   html {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-family:
+      "Plus Jakarta Sans",
+      system-ui,
+      -apple-system,
+      sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
@@ -118,7 +122,11 @@
   html *,
   html *::before,
   html *::after {
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease, box-shadow 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      color 0.15s ease,
+      box-shadow 0.3s ease;
   }
 
   body {
@@ -168,10 +176,21 @@
 
   /* Active states for mobile (no hover) */
   .mobile-press {
-    transition: transform 150ms ease, opacity 150ms ease;
+    transition:
+      transform 150ms ease,
+      opacity 150ms ease;
   }
   .mobile-press:active {
     transform: scale(0.97);
     opacity: 0.8;
   }
+}
+
+/* Barcode Scanner Styles */
+body.scanner-active,
+html.scanner-active {
+  background: transparent !important;
+  background-color: transparent !important;
+  --background: transparent;
+  --ion-background-color: transparent;
 }

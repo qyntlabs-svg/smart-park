@@ -2,12 +2,31 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import logo from "@/assets/logo.png";
+import { useAuthStore } from "@/store/auth.store";
 
 const SplashScreen = () => {
   const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const activeRole = useAuthStore((s) => s.activeRole);
+  const hasRole = useAuthStore((s) => s.hasRole);
 
   useEffect(() => {
     const timer = setTimeout(() => {
+      // Already logged in — skip onboarding/role-select entirely
+      if (isAuthenticated()) {
+        if (hasRole("admin")) {
+          navigate("/admin/dashboard", { replace: true });
+        } else if (
+          activeRole === "partner" ||
+          (!activeRole && hasRole("partner") && !hasRole("user"))
+        ) {
+          navigate("/partner/dashboard", { replace: true });
+        } else {
+          navigate("/home", { replace: true });
+        }
+        return;
+      }
+
       const hasSeenOnboarding = localStorage.getItem("hasSeenOnboarding");
       if (hasSeenOnboarding === "true") {
         navigate("/role-select", { replace: true });
@@ -32,7 +51,11 @@ const SplashScreen = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="flex items-center justify-center w-[140px] h-[140px] rounded-3xl bg-foreground/10 backdrop-blur-sm shadow-2xl overflow-hidden"
       >
-        <img src={logo} alt="Auto Doc logo" className="w-[120px] h-[120px] object-contain" />
+        <img
+          src={logo}
+          alt="Auto Doc logo"
+          className="w-[120px] h-[120px] object-contain"
+        />
       </motion.div>
 
       {/* App name */}

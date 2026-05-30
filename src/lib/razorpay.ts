@@ -40,7 +40,9 @@ export const loadRazorpayScript = (): Promise<boolean> => {
 };
 
 /** Open Razorpay Checkout */
-export const initiateRazorpayPayment = async (options: RazorpayPaymentOptions) => {
+export const initiateRazorpayPayment = async (
+  options: RazorpayPaymentOptions,
+) => {
   const loaded = await loadRazorpayScript();
   if (!loaded) {
     options.onFailure(new Error("Failed to load Razorpay SDK"));
@@ -82,12 +84,12 @@ export const initiateRazorpayPayment = async (options: RazorpayPaymentOptions) =
   rzp.open();
 };
 
-/** 
+/**
  * Mock payment for development (simulates Razorpay flow)
  * Remove this once real Razorpay key is configured
  */
 export const mockRazorpayPayment = (
-  options: RazorpayPaymentOptions
+  options: RazorpayPaymentOptions,
 ): Promise<RazorpaySuccessResponse> => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -102,10 +104,13 @@ export const mockRazorpayPayment = (
 
 /**
  * Commission calculation utility
- * Platform takes a commission, rest goes to vendor
+ * Platform takes a commission, rest goes to partner
  */
-export const calculateCommission = (amount: number, commissionPercent: number = 10) => {
+export const calculateCommission = (
+  amount: number,
+  commissionPercent: number = 10,
+) => {
   const commission = Math.round((amount * commissionPercent) / 100);
-  const vendorShare = amount - commission;
-  return { total: amount, commission, vendorShare, commissionPercent };
+  const partnerShare = amount - commission;
+  return { total: amount, commission, partnerShare, commissionPercent };
 };

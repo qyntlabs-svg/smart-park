@@ -1,13 +1,26 @@
 import { useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronLeft, MapPin, Car, Clock, Pencil, CalendarIcon, ChevronUp, ChevronDown } from "lucide-react";
+import {
+  ChevronLeft,
+  Car,
+  Clock,
+  Pencil,
+  CalendarIcon,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
-import { format, differenceInHours, differenceInMinutes, isBefore, isEqual } from "date-fns";
+import { format, isBefore } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import PageTransition from "@/components/PageTransition";
+import { useCreateBooking } from "@/api/bookings";
 
 const generateTimeOptions = () => {
   const options: string[] = [];
@@ -38,21 +51,49 @@ const BookingSummaryScreen = () => {
   const slotNumber = state?.slotNumber || "A3";
   const slotType = state?.slotType || "covered";
   const price = state?.price || 40;
+  const facilityName = state?.facilityName || "Parking Facility";
+  const facilityLat = state?.facilityLat ?? null;
+  const facilityLng = state?.facilityLng ?? null;
+  const facilityAddress = state?.facilityAddress ?? null;
+  const slotId = state?.slotId;
+  const parkingId = state?.parkingId;
+  const vehicleId = state?.vehicleId;
+  const vehicleRegistration = state?.vehicleRegistration || "TN 01 AB 1234";
+
+  // Fix #10: Use pre-selected times from SlotSelectionScreen if available
+  const preStartTime = state?.startTime as string | undefined;
+  const preEndTime = state?.endTime as string | undefined;
 
   const now = new Date();
-  const [startDate, setStartDate] = useState<Date>(now);
-  const [endDate, setEndDate] = useState<Date>(now);
+
+  const parsePreTime = (iso: string) => {
+    const d = new Date(iso);
+    return {
+      date: d,
+      time: `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`,
+    };
+  };
+
+  const preStart = preStartTime ? parsePreTime(preStartTime) : null;
+  const preEnd = preEndTime ? parsePreTime(preEndTime) : null;
+
+  const [startDate, setStartDate] = useState<Date>(preStart?.date ?? now);
+  const [endDate, setEndDate] = useState<Date>(preEnd?.date ?? now);
   const [startTime, setStartTime] = useState(() => {
+    if (preStart) return preStart.time;
     const h = now.getHours();
     const m = now.getMinutes() < 30 ? 30 : 0;
     const hAdj = now.getMinutes() >= 30 ? h + 1 : h;
     return `${(hAdj % 24).toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
   });
   const [endTime, setEndTime] = useState(() => {
+    if (preEnd) return preEnd.time;
     const [h, m] = startTime.split(":").map(Number);
     return `${((h + 2) % 24).toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const createBooking = useCreateBooking();
 
   const totalMinutes = useMemo(() => {
     const [sh, sm] = startTime.split(":").map(Number);
@@ -75,29 +116,76 @@ const BookingSummaryScreen = () => {
     return parts.join(" ") || "0 min";
   }, [totalMinutes]);
 
-  const durationHours = useMemo(() => Math.ceil(totalMinutes / 60), [totalMinutes]);
-  const totalPrice = useMemo(() => durationHours * price, [durationHours, price]);
+  const durationHours = useMemo(
+    () => Math.ceil(totalMinutes / 60),
+    [totalMinutes],
+  );
+  const totalPrice = useMemo(
+    () => durationHours * price,
+    [durationHours, price],
+  );
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    if (!slotId || !parkingId || !vehicleId) {
+      setError("Missing booking details. Please go back and try again.");
+      return;
+    }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    setError("");
+    try {
+      const [sh, sm] = startTime.split(":").map(Number);
+      const [eh, em] = endTime.split(":").map(Number);
+      const startDt = new Date(startDate);
+      startDt.setHours(sh, sm, 0, 0);
+      const endDt = new Date(endDate);
+      endDt.setHours(eh, em, 0, 0);
+
+      const booking = await createBooking.mutateAsync({
+        facility_id: parkingId,
+        slot_id: slotId,
+        vehicle_id: vehicleId,
+        vehicle_type: state?.vehicleType,
+        start_time: startDt.toISOString(),
+        end_time: endDt.toISOString(),
+      });
+
       navigate("/upi-payment", {
         replace: true,
         state: {
+          bookingId: booking.id,
+          bookingReference: booking.booking_reference,
           slot: slotNumber,
-          parking: "Phoenix Mall Parking",
-          price: totalPrice,
+          parking: facilityName,
+          facilityLat,
+          facilityLng,
+          facilityAddress,
+          price: booking.total_amount,
           duration: durationText,
         },
       });
-    }, 800);
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.error?.message ||
+          "Failed to create booking. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const TimeSelector = ({ value, onChange, label }: { value: string; onChange: (v: string) => void; label: string }) => {
+  const TimeSelector = ({
+    value,
+    onChange,
+    label,
+  }: {
+    value: string;
+    onChange: (v: string) => void;
+    label: string;
+  }) => {
     const currentIndex = TIME_OPTIONS.indexOf(value);
     const scrollUp = () => {
-      const prev = (currentIndex - 1 + TIME_OPTIONS.length) % TIME_OPTIONS.length;
+      const prev =
+        (currentIndex - 1 + TIME_OPTIONS.length) % TIME_OPTIONS.length;
       onChange(TIME_OPTIONS[prev]);
     };
     const scrollDown = () => {
@@ -106,15 +194,25 @@ const BookingSummaryScreen = () => {
     };
     return (
       <div className="flex flex-col items-center gap-1">
-        <span className="text-caption text-muted-foreground font-semibold">{label}</span>
+        <span className="text-caption text-muted-foreground font-semibold">
+          {label}
+        </span>
         <div className="flex flex-col items-center">
-          <button onClick={scrollUp} className="touch-target flex items-center justify-center">
+          <button
+            onClick={scrollUp}
+            className="touch-target flex items-center justify-center"
+          >
             <ChevronUp className="w-5 h-5 text-muted-foreground" />
           </button>
           <div className="bg-secondary rounded-xl px-4 py-2 min-w-[100px] text-center">
-            <span className="text-body font-bold text-foreground">{formatTime12(value)}</span>
+            <span className="text-body font-bold text-foreground">
+              {formatTime12(value)}
+            </span>
           </div>
-          <button onClick={scrollDown} className="touch-target flex items-center justify-center">
+          <button
+            onClick={scrollDown}
+            className="touch-target flex items-center justify-center"
+          >
             <ChevronDown className="w-5 h-5 text-muted-foreground" />
           </button>
         </div>
@@ -126,10 +224,7 @@ const BookingSummaryScreen = () => {
     {
       label: "PARKING LOCATION",
       content: (
-        <>
-          <p className="text-body font-bold text-foreground">Phoenix Mall Parking</p>
-          <p className="mt-1 text-body-sm text-muted-foreground">123, Mount Road, Tambaram, Chennai</p>
-        </>
+        <p className="text-body font-bold text-foreground">{facilityName}</p>
       ),
     },
     {
@@ -137,7 +232,9 @@ const BookingSummaryScreen = () => {
       content: (
         <>
           <p className="text-heading-md text-primary">{slotNumber}</p>
-          <p className="mt-1 text-body-sm text-muted-foreground capitalize">{slotType} • Near Entry</p>
+          <p className="mt-1 text-body-sm text-muted-foreground capitalize">
+            {slotType} · Near Entry
+          </p>
         </>
       ),
     },
@@ -146,10 +243,9 @@ const BookingSummaryScreen = () => {
       content: (
         <div className="flex items-center gap-3">
           <Car className="w-5 h-5 text-primary" />
-          <div>
-            <p className="text-body-sm font-bold text-foreground">TN 01 AB 1234</p>
-            <p className="text-caption text-muted-foreground">My Car</p>
-          </div>
+          <p className="text-body-sm font-bold text-foreground">
+            {vehicleRegistration}
+          </p>
         </div>
       ),
     },
@@ -160,10 +256,15 @@ const BookingSummaryScreen = () => {
       <div className="min-h-[100dvh] w-full max-w-md mx-auto bg-background flex flex-col">
         {/* Header */}
         <header className="flex items-center h-[60px] px-4 pt-safe bg-card border-b border-border">
-          <button onClick={() => navigate(-1)} className="touch-target flex items-center justify-center -ml-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="touch-target flex items-center justify-center -ml-2"
+          >
             <ChevronLeft className="w-6 h-6 text-foreground" />
           </button>
-          <h1 className="flex-1 text-body font-bold text-foreground text-center">Booking Summary</h1>
+          <h1 className="flex-1 text-body font-bold text-foreground text-center">
+            Booking Summary
+          </h1>
           <div className="w-[44px]" />
         </header>
 
@@ -177,77 +278,141 @@ const BookingSummaryScreen = () => {
               className="bg-card border border-border rounded-2xl p-5 relative"
             >
               <div className="flex items-center justify-between mb-3">
-                <p className="text-caption font-semibold text-muted-foreground uppercase tracking-wider">{card.label}</p>
+                <p className="text-caption font-semibold text-muted-foreground uppercase tracking-wider">
+                  {card.label}
+                </p>
                 <Pencil className="w-4 h-4 text-muted-foreground" />
               </div>
               {card.content}
             </motion.div>
           ))}
 
-          {/* Start date & time */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-card border border-border rounded-2xl p-5"
-          >
-            <p className="text-caption font-semibold text-muted-foreground uppercase tracking-wider mb-3">Start Date & Time</p>
-            <div className="flex items-center gap-3">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button className="flex-1 flex items-center gap-2 p-3 bg-secondary rounded-xl">
-                    <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
-                    <span className="text-body-sm font-semibold text-foreground">{format(startDate, "dd MMM yyyy")}</span>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={(d) => {
-                      if (!d) return;
-                      setStartDate(d);
-                      if (isBefore(endDate, d)) setEndDate(d);
-                    }}
-                    disabled={(d) => isBefore(d, new Date(now.getFullYear(), now.getMonth(), now.getDate()))}
-                    className={cn("p-3 pointer-events-auto")}
+          {/* Time section — read-only if pre-selected from slot screen, editable otherwise */}
+          {preStart && preEnd ? (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-card border border-border rounded-2xl p-5"
+            >
+              <p className="text-caption font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                Booking Time
+              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-body-sm text-muted-foreground">Start</p>
+                  <p className="text-body font-bold text-foreground">
+                    {format(preStart.date, "dd MMM yyyy")} ·{" "}
+                    {formatTime12(preStart.time)}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-body-sm text-muted-foreground">End</p>
+                  <p className="text-body font-bold text-foreground">
+                    {format(preEnd.date, "dd MMM yyyy")} ·{" "}
+                    {formatTime12(preEnd.time)}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-3 text-caption text-primary font-semibold text-center">
+                Duration: {durationText}
+              </p>
+            </motion.div>
+          ) : (
+            <>
+              {/* Start date & time */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-card border border-border rounded-2xl p-5"
+              >
+                <p className="text-caption font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                  Start Date & Time
+                </p>
+                <div className="flex items-center gap-3">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="flex-1 flex items-center gap-2 p-3 bg-secondary rounded-xl">
+                        <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
+                        <span className="text-body-sm font-semibold text-foreground">
+                          {format(startDate, "dd MMM yyyy")}
+                        </span>
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={(d) => {
+                          if (!d) return;
+                          setStartDate(d);
+                          if (isBefore(endDate, d)) setEndDate(d);
+                        }}
+                        disabled={(d) =>
+                          isBefore(
+                            d,
+                            new Date(
+                              now.getFullYear(),
+                              now.getMonth(),
+                              now.getDate(),
+                            ),
+                          )
+                        }
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <TimeSelector
+                    label=""
+                    value={startTime}
+                    onChange={setStartTime}
                   />
-                </PopoverContent>
-              </Popover>
-              <TimeSelector label="" value={startTime} onChange={setStartTime} />
-            </div>
-          </motion.div>
+                </div>
+              </motion.div>
 
-          {/* End date & time */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-card border border-border rounded-2xl p-5"
-          >
-            <p className="text-caption font-semibold text-muted-foreground uppercase tracking-wider mb-3">End Date & Time</p>
-            <div className="flex items-center gap-3">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button className="flex-1 flex items-center gap-2 p-3 bg-secondary rounded-xl">
-                    <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
-                    <span className="text-body-sm font-semibold text-foreground">{format(endDate, "dd MMM yyyy")}</span>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={(d) => d && setEndDate(d)}
-                    disabled={(d) => isBefore(d, startDate)}
-                    className={cn("p-3 pointer-events-auto")}
+              {/* End date & time */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="bg-card border border-border rounded-2xl p-5"
+              >
+                <p className="text-caption font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                  End Date & Time
+                </p>
+                <div className="flex items-center gap-3">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="flex-1 flex items-center gap-2 p-3 bg-secondary rounded-xl">
+                        <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
+                        <span className="text-body-sm font-semibold text-foreground">
+                          {format(endDate, "dd MMM yyyy")}
+                        </span>
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={(d) => d && setEndDate(d)}
+                        disabled={(d) => isBefore(d, startDate)}
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <TimeSelector
+                    label=""
+                    value={endTime}
+                    onChange={setEndTime}
                   />
-                </PopoverContent>
-              </Popover>
-              <TimeSelector label="" value={endTime} onChange={setEndTime} />
-            </div>
-            <p className="mt-3 text-caption text-primary font-semibold text-center">Duration: {durationText}</p>
-          </motion.div>
+                </div>
+                <p className="mt-3 text-caption text-primary font-semibold text-center">
+                  Duration: {durationText}
+                </p>
+              </motion.div>
+            </>
+          )}
 
           {/* Price breakdown */}
           <motion.div
@@ -256,21 +421,38 @@ const BookingSummaryScreen = () => {
             transition={{ delay: 0.5 }}
             className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-5"
           >
-            <p className="text-caption font-semibold text-primary uppercase tracking-wider mb-3">Estimated Price</p>
+            <p className="text-caption font-semibold text-primary uppercase tracking-wider mb-3">
+              Estimated Price
+            </p>
             <div className="flex items-center justify-between">
-              <span className="text-body-sm text-foreground">₹{price} × {durationHours} hr{durationHours > 1 ? "s" : ""}</span>
-              <span className="text-body-sm font-semibold text-foreground">₹{totalPrice}</span>
+              <span className="text-body-sm text-foreground">
+                ₹{price} × {durationHours} hr{durationHours > 1 ? "s" : ""}
+              </span>
+              <span className="text-body-sm font-semibold text-foreground">
+                ₹{totalPrice}
+              </span>
             </div>
             <div className="mt-3 pt-3 border-t border-primary/20 flex items-center justify-between">
               <span className="text-body font-bold text-foreground">Total</span>
-              <span className="text-heading-md text-primary">₹{totalPrice}</span>
+              <span className="text-heading-md text-primary">
+                ₹{totalPrice}
+              </span>
             </div>
           </motion.div>
         </div>
 
         {/* Confirm button */}
         <div className="px-4 pb-4 pb-safe bg-background">
-          <MobileButton fullWidth loading={loading} onClick={handleConfirm}>
+          {error && (
+            <p className="mb-3 text-body-sm text-destructive text-center">
+              {error}
+            </p>
+          )}
+          <MobileButton
+            fullWidth
+            loading={loading || createBooking.isPending}
+            onClick={handleConfirm}
+          >
             Proceed to Payment
           </MobileButton>
         </div>

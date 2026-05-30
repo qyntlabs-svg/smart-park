@@ -1,7 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  X, HelpCircle, FileText, Info, Share2, Star, Shield, ChevronRight
+  X,
+  HelpCircle,
+  FileText,
+  Info,
+  Share2,
+  Star,
+  Shield,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,11 +23,12 @@ const MENU_ITEMS = [
   { label: "About", icon: Info, route: "/about" },
 ];
 
-const VendorSideDrawer = ({ open, onClose }: Props) => {
+const PartnerSideDrawer = ({ open, onClose }: Props) => {
   const navigate = useNavigate();
 
   const handleShare = async () => {
-    const text = "Check out Auto Doc – Smart Parking Management for Vendors!\nhttps://play.google.com/store/apps/details?id=com.autodoc.app";
+    const text =
+      "Check out Auto Doc – Smart Parking Management for Partners!\nhttps://play.google.com/store/apps/details?id=com.autodoc.app";
     try {
       if (navigator.share) {
         await navigator.share({ title: "Auto Doc", text });
@@ -33,7 +41,10 @@ const VendorSideDrawer = ({ open, onClose }: Props) => {
   };
 
   const handleRate = () => {
-    window.open("https://play.google.com/store/apps/details?id=com.autodoc.app", "_blank");
+    window.open(
+      "https://play.google.com/store/apps/details?id=com.autodoc.app",
+      "_blank",
+    );
     onClose();
   };
 
@@ -58,7 +69,10 @@ const VendorSideDrawer = ({ open, onClose }: Props) => {
             {/* Header */}
             <div className="flex items-center justify-between px-4 h-[60px] pt-safe border-b border-border">
               <span className="text-body font-bold text-foreground">Menu</span>
-              <button onClick={onClose} className="touch-target flex items-center justify-center">
+              <button
+                onClick={onClose}
+                className="touch-target flex items-center justify-center"
+              >
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
@@ -68,11 +82,16 @@ const VendorSideDrawer = ({ open, onClose }: Props) => {
               {MENU_ITEMS.map((item) => (
                 <button
                   key={item.label}
-                  onClick={() => { onClose(); navigate(item.route); }}
+                  onClick={() => {
+                    onClose();
+                    navigate(item.route);
+                  }}
                   className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-secondary transition-colors"
                 >
                   <item.icon className="w-5 h-5 text-muted-foreground" />
-                  <span className="flex-1 text-left text-body-sm font-semibold text-foreground">{item.label}</span>
+                  <span className="flex-1 text-left text-body-sm font-semibold text-foreground">
+                    {item.label}
+                  </span>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </button>
               ))}
@@ -84,19 +103,25 @@ const VendorSideDrawer = ({ open, onClose }: Props) => {
                 className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-secondary transition-colors"
               >
                 <Share2 className="w-5 h-5 text-muted-foreground" />
-                <span className="flex-1 text-left text-body-sm font-semibold text-foreground">Share App</span>
+                <span className="flex-1 text-left text-body-sm font-semibold text-foreground">
+                  Share App
+                </span>
               </button>
               <button
                 onClick={handleRate}
                 className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-secondary transition-colors"
               >
                 <Star className="w-5 h-5 text-muted-foreground" />
-                <span className="flex-1 text-left text-body-sm font-semibold text-foreground">Rate Us</span>
+                <span className="flex-1 text-left text-body-sm font-semibold text-foreground">
+                  Rate Us
+                </span>
               </button>
             </div>
 
             <div className="px-4 pb-6 pb-safe text-center">
-              <p className="text-caption text-muted-foreground">Auto Doc Vendor v1.0.0</p>
+              <p className="text-caption text-muted-foreground">
+                Auto Doc Partner v1.0.0
+              </p>
             </div>
           </motion.div>
         </>
@@ -105,4 +130,4 @@ const VendorSideDrawer = ({ open, onClose }: Props) => {
   );
 };
 
-export default VendorSideDrawer;
+export default PartnerSideDrawer;

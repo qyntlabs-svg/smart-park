@@ -5,6 +5,7 @@ import { Car, Bike, ChevronLeft } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { useAddVehicle } from "@/api/vehicles";
 
 const COLORS = [
   { name: "Red", value: "0 84% 60%" },
@@ -22,28 +23,37 @@ const AddVehicleScreen = () => {
   const location = useLocation();
   const isFirstTime = (location.state as any)?.first === true;
 
-  const [vehicleType, setVehicleType] = useState<"two_wheeler" | "four_wheeler" | null>(null);
+  const [vehicleType, setVehicleType] = useState<
+    "two_wheeler" | "four_wheeler" | null
+  >(null);
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [nickname, setNickname] = useState("");
   const [model, setModel] = useState("");
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [isDefault, setIsDefault] = useState(true);
-  const [loading, setLoading] = useState(false);
 
   const isValid = vehicleType && vehicleNumber.trim().length >= 4;
 
-  const handleSave = async () => {
-    if (!isValid) return;
-    setLoading(true);
+  const addVehicle = useAddVehicle();
 
-    // TODO: Save to Supabase vehicles table
-    setTimeout(() => {
-      setLoading(false);
+  const handleSave = async () => {
+    if (!isValid || !vehicleType) return;
+    try {
+      await addVehicle.mutateAsync({
+        registration_number: vehicleNumber,
+        vehicle_type: vehicleType,
+        nickname: nickname || undefined,
+        model: model || undefined,
+        color_hsl: selectedColor || undefined,
+        is_default: isDefault,
+      });
       navigate("/vehicle-added", {
         replace: true,
         state: { vehicleNumber, nickname, vehicleType, isDefault },
       });
-    }, 800);
+    } catch (err: any) {
+      // error handled by mutation state
+    }
   };
 
   // First-time mandatory prompt
@@ -82,7 +92,10 @@ const AddVehicleScreen = () => {
           transition={{ delay: 0.45 }}
           className="mt-12 w-[280px]"
         >
-          <MobileButton fullWidth onClick={() => setVehicleType("four_wheeler")}>
+          <MobileButton
+            fullWidth
+            onClick={() => setVehicleType("four_wheeler")}
+          >
             Add My First Vehicle
           </MobileButton>
         </motion.div>
@@ -95,11 +108,16 @@ const AddVehicleScreen = () => {
       {/* Header */}
       <div className="flex items-center h-[60px] px-4 pt-safe border-b border-border bg-card">
         {!isFirstTime && (
-          <button onClick={() => navigate(-1)} className="touch-target flex items-center justify-center -ml-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="touch-target flex items-center justify-center -ml-2"
+          >
             <ChevronLeft className="w-6 h-6 text-foreground" />
           </button>
         )}
-        <h1 className="flex-1 text-body font-bold text-foreground text-center">Add Vehicle</h1>
+        <h1 className="flex-1 text-body font-bold text-foreground text-center">
+          Add Vehicle
+        </h1>
         <div className="w-[44px]" />
       </div>
 
@@ -127,7 +145,9 @@ const AddVehicleScreen = () => {
                 className={`w-10 h-10 ${vehicleType === type ? "text-primary" : "text-muted-foreground"}`}
                 strokeWidth={1.5}
               />
-              <span className={`text-body-sm font-semibold ${vehicleType === type ? "text-primary" : "text-foreground"}`}>
+              <span
+                className={`text-body-sm font-semibold ${vehicleType === type ? "text-primary" : "text-foreground"}`}
+              >
                 {label}
               </span>
             </motion.button>
@@ -161,7 +181,9 @@ const AddVehicleScreen = () => {
 
             {/* Nickname */}
             <div>
-              <label className="text-body-sm font-semibold text-foreground">Vehicle Nickname</label>
+              <label className="text-body-sm font-semibold text-foreground">
+                Vehicle Nickname
+              </label>
               <Input
                 className="mt-2 h-14 rounded-xl text-body px-4"
                 placeholder="e.g., My Red Car, Office Bike"
@@ -175,7 +197,9 @@ const AddVehicleScreen = () => {
 
             {/* Model */}
             <div>
-              <label className="text-body-sm font-semibold text-foreground">Vehicle Model</label>
+              <label className="text-body-sm font-semibold text-foreground">
+                Vehicle Model
+              </label>
               <Input
                 className="mt-2 h-14 rounded-xl text-body px-4"
                 placeholder="e.g., Honda City, Royal Enfield"
@@ -186,14 +210,18 @@ const AddVehicleScreen = () => {
 
             {/* Color picker */}
             <div>
-              <label className="text-body-sm font-semibold text-foreground">Vehicle Color</label>
+              <label className="text-body-sm font-semibold text-foreground">
+                Vehicle Color
+              </label>
               <div className="mt-3 flex gap-3 overflow-x-auto scrollbar-hide pb-2">
                 {COLORS.map((c) => (
                   <button
                     key={c.name}
                     onClick={() => setSelectedColor(c.value)}
                     className={`shrink-0 w-11 h-11 rounded-full border-2 transition-all ${
-                      selectedColor === c.value ? "border-primary ring-2 ring-primary/30 scale-110" : "border-border"
+                      selectedColor === c.value
+                        ? "border-primary ring-2 ring-primary/30 scale-110"
+                        : "border-border"
                     }`}
                     style={{ backgroundColor: `hsl(${c.value})` }}
                     title={c.name}
@@ -205,8 +233,12 @@ const AddVehicleScreen = () => {
             {/* Default toggle */}
             <div className="flex items-center justify-between py-2">
               <div>
-                <p className="text-body-sm font-semibold text-foreground">Set as default vehicle</p>
-                <p className="mt-0.5 text-caption text-muted-foreground">Used for quick booking</p>
+                <p className="text-body-sm font-semibold text-foreground">
+                  Set as default vehicle
+                </p>
+                <p className="mt-0.5 text-caption text-muted-foreground">
+                  Used for quick booking
+                </p>
               </div>
               <Switch checked={isDefault} onCheckedChange={setIsDefault} />
             </div>
@@ -220,7 +252,7 @@ const AddVehicleScreen = () => {
           <MobileButton
             fullWidth
             disabled={!isValid}
-            loading={loading}
+            loading={addVehicle.isPending}
             onClick={handleSave}
           >
             Save & Continue

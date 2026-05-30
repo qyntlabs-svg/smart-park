@@ -10,11 +10,20 @@ interface BottomSheetProps {
   className?: string;
 }
 
-const BottomSheet = ({ open, onClose, snapPoints = [0.9], children, className }: BottomSheetProps) => {
+const BottomSheet = ({
+  open,
+  onClose,
+  snapPoints = [0.9],
+  children,
+  className,
+}: BottomSheetProps) => {
   const maxSnap = snapPoints[snapPoints.length - 1];
   const sheetHeight = `${maxSnap * 100}vh`;
 
-  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const handleDragEnd = (
+    _: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) => {
     if (info.velocity.y > 300 || info.offset.y > 150) {
       onClose();
     }
@@ -29,7 +38,7 @@ const BottomSheet = ({ open, onClose, snapPoints = [0.9], children, className }:
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[9999] bg-foreground/40 backdrop-blur-sm"
             onClick={onClose}
           />
           <motion.div
@@ -43,18 +52,16 @@ const BottomSheet = ({ open, onClose, snapPoints = [0.9], children, className }:
             onDragEnd={handleDragEnd}
             style={{ height: sheetHeight }}
             className={cn(
-              "fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50 rounded-t-3xl bg-card shadow-2xl",
+              "fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-[9999] rounded-t-3xl bg-card shadow-2xl",
               "pb-safe",
-              className
+              className,
             )}
           >
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-2">
               <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
             </div>
-            <div className="overflow-y-auto h-full px-6 pb-8">
-              {children}
-            </div>
+            <div className="overflow-y-auto h-full px-6 pb-8">{children}</div>
           </motion.div>
         </>
       )}
