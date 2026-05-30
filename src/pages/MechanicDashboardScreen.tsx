@@ -8,7 +8,34 @@ const MechanicDashboardScreen = () => {
   const navigate = useNavigate();
   const [auth] = useState(getMechanicAuth());
   const [shop, setShop] = useState(getMechanicShop());
-  const pendingCount = shop ? getShopBookings(shop.id).filter((b) => b.status === "pending").length : 0;
+  const bookings = shop ? getShopBookings(shop.id) : [];
+  const pendingCount = bookings.filter((b) => b.status === "pending").length;
+  const completedBookings = bookings.filter((b) => b.status === "completed");
+  const earnings = completedBookings.reduce((sum, b) => sum + (b.price || 0), 0);
+  const views = 180 + bookings.length * 37 + completedBookings.length * 24;
+
+  // Seed mock reviews tied to completed bookings if shop has none
+  useEffect(() => {
+    if (!shop) return;
+    if (shop.reviews && shop.reviews.length > 0) return;
+    if (completedBookings.length === 0) return;
+    const mockReviews = [
+      { id: "mr1", user: "Vignesh Kumar", rating: 5, comment: "Quick doorstep jumpstart, saved my morning!", date: "2 days ago" },
+      { id: "mr2", user: "Sneha Iyer", rating: 4, comment: "Neat washing & detailing, will come back.", date: "3 days ago" },
+      { id: "mr3", user: "Arjun Mehta", rating: 5, comment: "Fair pricing and friendly mechanic.", date: "5 days ago" },
+      { id: "mr4", user: "Divya Raghavan", rating: 4, comment: "Tyres replaced quickly, good service.", date: "1 week ago" },
+    ];
+    const avg = mockReviews.reduce((s, r) => s + r.rating, 0) / mockReviews.length;
+    const updated = {
+      ...shop,
+      reviews: mockReviews,
+      reviewCount: mockReviews.length,
+      rating: Math.round(avg * 10) / 10,
+    };
+    setMechanicShop(updated);
+    setShop(updated);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!auth) return navigate("/mechanic/login", { replace: true });
@@ -72,8 +99,8 @@ const MechanicDashboardScreen = () => {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { icon: Eye, label: "Views", value: "—" },
-            { icon: IndianRupee, label: "Earnings", value: "₹0" },
+            { icon: Eye, label: "Views", value: views.toLocaleString("en-IN") },
+            { icon: IndianRupee, label: "Earnings", value: `₹${earnings.toLocaleString("en-IN")}` },
             { icon: Star, label: "Reviews", value: shop.reviewCount.toString() },
           ].map((s) => (
             <div key={s.label} className="p-3 rounded-xl bg-card border border-border text-center">
