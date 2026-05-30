@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Wrench, Star, MapPin, Settings, LogOut, IndianRupee, Eye, ToggleLeft, ToggleRight, ClipboardList } from "lucide-react";
+import { Wrench, Star, MapPin, Settings, LogOut, IndianRupee, Eye, ToggleLeft, ToggleRight, ClipboardList, MessageSquare } from "lucide-react";
 import { getMechanicAuth, getMechanicShop, getShopBookings, setMechanicAuth, setMechanicShop } from "@/lib/mechanic";
 
 const MechanicDashboardScreen = () => {
@@ -101,13 +101,17 @@ const MechanicDashboardScreen = () => {
           {[
             { icon: Eye, label: "Views", value: views.toLocaleString("en-IN") },
             { icon: IndianRupee, label: "Earnings", value: `₹${earnings.toLocaleString("en-IN")}` },
-            { icon: Star, label: "Reviews", value: shop.reviewCount.toString() },
+            { icon: Star, label: "Reviews", value: shop.reviewCount.toString(), onClick: () => navigate("/mechanic/reviews") },
           ].map((s) => (
-            <div key={s.label} className="p-3 rounded-xl bg-card border border-border text-center">
+            <button
+              key={s.label}
+              onClick={(s as { onClick?: () => void }).onClick}
+              className="p-3 rounded-xl bg-card border border-border text-center"
+            >
               <s.icon className="w-4 h-4 mx-auto text-primary" />
               <p className="text-body-sm font-bold text-foreground mt-1">{s.value}</p>
               <p className="text-caption text-muted-foreground">{s.label}</p>
-            </div>
+            </button>
           ))}
         </div>
 
@@ -138,6 +142,14 @@ const MechanicDashboardScreen = () => {
               {pendingCount}
             </span>
           )}
+        </motion.button>
+
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={() => navigate("/mechanic/reviews")}
+          className="w-full h-12 rounded-xl bg-secondary text-foreground font-semibold flex items-center justify-center gap-2"
+        >
+          <MessageSquare className="w-4 h-4" /> Reviews & Replies
         </motion.button>
 
         <motion.button
