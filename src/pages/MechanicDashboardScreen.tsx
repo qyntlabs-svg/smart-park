@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Wrench, Star, MapPin, Settings, LogOut, IndianRupee, Eye, ToggleLeft, ToggleRight } from "lucide-react";
-import { getMechanicAuth, getMechanicShop, setMechanicAuth, setMechanicShop } from "@/lib/mechanic";
+import { Wrench, Star, MapPin, Settings, LogOut, IndianRupee, Eye, ToggleLeft, ToggleRight, ClipboardList } from "lucide-react";
+import { getMechanicAuth, getMechanicShop, getShopBookings, setMechanicAuth, setMechanicShop } from "@/lib/mechanic";
 
 const MechanicDashboardScreen = () => {
   const navigate = useNavigate();
   const [auth] = useState(getMechanicAuth());
   const [shop, setShop] = useState(getMechanicShop());
+  const pendingCount = shop ? getShopBookings(shop.id).filter((b) => b.status === "pending").length : 0;
 
   useEffect(() => {
     if (!auth) return navigate("/mechanic/login", { replace: true });
@@ -101,8 +102,21 @@ const MechanicDashboardScreen = () => {
 
         <motion.button
           whileTap={{ scale: 0.98 }}
+          onClick={() => navigate("/mechanic/bookings")}
+          className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 relative"
+        >
+          <ClipboardList className="w-4 h-4" /> Bookings
+          {pendingCount > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-destructive text-white text-caption font-bold flex items-center justify-center">
+              {pendingCount}
+            </span>
+          )}
+        </motion.button>
+
+        <motion.button
+          whileTap={{ scale: 0.98 }}
           onClick={() => navigate("/mechanic/setup")}
-          className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2"
+          className="w-full h-12 rounded-xl bg-secondary text-foreground font-semibold flex items-center justify-center gap-2"
         >
           <Settings className="w-4 h-4" /> Edit Shop
         </motion.button>
