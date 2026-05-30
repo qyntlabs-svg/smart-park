@@ -281,7 +281,130 @@ export function updateMechanicBooking(id: string, patch: Partial<MechanicBooking
 }
 
 export function getShopBookings(shopId: string): MechanicBooking[] {
-  return getMechanicBookings().filter((b) => b.shopId === shopId);
+  const existing = getMechanicBookings().filter((b) => b.shopId === shopId);
+  if (existing.length > 0) return existing;
+  // Seed mock bookings on first access for this shop
+  const shop = getMechanicShop();
+  const shopName = shop?.shopName || "My Shop";
+  const now = Date.now();
+  const mocks: MechanicBooking[] = [
+    {
+      id: `mock-${shopId}-1`,
+      shopId,
+      shopName,
+      service: "General Service & Oil Change",
+      price: 1200,
+      date: new Date(now - 1000 * 60 * 30).toISOString(),
+      status: "pending",
+      contactRevealed: false,
+      serviceType: "doorstep",
+      customerName: "Arjun Mehta",
+      customerPhone: "+91 98401 23456",
+      customerLocation: {
+        lat: 12.9249,
+        lng: 80.1,
+        address: "23, 1st Main Rd, Tambaram West, Chennai",
+      },
+    },
+    {
+      id: `mock-${shopId}-2`,
+      shopId,
+      shopName,
+      service: "Tyres & Brakes",
+      price: 850,
+      date: new Date(now - 1000 * 60 * 90).toISOString(),
+      status: "pending",
+      contactRevealed: false,
+      serviceType: "shop",
+      customerName: "Divya Raghavan",
+      customerPhone: "+91 99620 11223",
+    },
+    {
+      id: `mock-${shopId}-3`,
+      shopId,
+      shopName,
+      service: "AC & Electricals",
+      price: 1500,
+      date: new Date(now - 1000 * 60 * 60 * 5).toISOString(),
+      status: "accepted",
+      contactRevealed: true,
+      serviceType: "doorstep",
+      customerName: "Karthik Subramanian",
+      customerPhone: "+91 90030 44556",
+      customerLocation: {
+        lat: 12.9165,
+        lng: 80.1226,
+        address: "Selaiyur Main Rd, Chennai",
+      },
+    },
+    {
+      id: `mock-${shopId}-4`,
+      shopId,
+      shopName,
+      service: "Periodic Service",
+      price: 600,
+      date: new Date(now - 1000 * 60 * 60 * 26).toISOString(),
+      status: "accepted",
+      contactRevealed: true,
+      serviceType: "shop",
+      customerName: "Meera Pillai",
+      customerPhone: "+91 89399 77881",
+    },
+    {
+      id: `mock-${shopId}-5`,
+      shopId,
+      shopName,
+      service: "Battery & Jumpstart",
+      price: 750,
+      date: new Date(now - 1000 * 60 * 60 * 48).toISOString(),
+      status: "completed",
+      contactRevealed: true,
+      serviceType: "doorstep",
+      customerName: "Vignesh Kumar",
+      customerPhone: "+91 90876 55432",
+      customerLocation: {
+        lat: 12.9341,
+        lng: 80.1131,
+        address: "Rajakilpakkam, Tambaram, Chennai",
+      },
+      paid: true,
+    },
+    {
+      id: `mock-${shopId}-6`,
+      shopId,
+      shopName,
+      service: "Washing & Detailing",
+      price: 450,
+      date: new Date(now - 1000 * 60 * 60 * 72).toISOString(),
+      status: "completed",
+      contactRevealed: true,
+      serviceType: "shop",
+      customerName: "Sneha Iyer",
+      customerPhone: "+91 87543 21098",
+      paid: true,
+    },
+    {
+      id: `mock-${shopId}-7`,
+      shopId,
+      shopName,
+      service: "Engine & Performance",
+      price: 2200,
+      date: new Date(now - 1000 * 60 * 60 * 12).toISOString(),
+      status: "rejected",
+      contactRevealed: false,
+      serviceType: "doorstep",
+      customerName: "Rohan Das",
+      customerPhone: "+91 98765 12340",
+      customerLocation: {
+        lat: 12.9501,
+        lng: 80.1402,
+        address: "Chromepet, Chennai",
+      },
+    },
+  ];
+  const all = [...mocks, ...getMechanicBookings()];
+  localStorage.setItem(BOOKINGS_KEY, JSON.stringify(all));
+  return mocks;
 }
 
 export function maskContact(value: string) {
