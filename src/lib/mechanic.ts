@@ -43,6 +43,7 @@ export interface MechanicShop {
   reviewCount: number;
   reviews: MechanicReview[];
   open: boolean;
+  upiId?: string;
 }
 
 export type VehicleCategory = "bike" | "car" | "auto" | "commercial" | "ev" | "bicycle";
@@ -249,8 +250,13 @@ export interface MechanicBooking {
   service: string;
   price: number;
   date: string;
-  status: "confirmed" | "completed";
+  status: "pending" | "accepted" | "rejected" | "completed";
   contactRevealed: boolean;
+  serviceType: "shop" | "doorstep";
+  customerName: string;
+  customerPhone: string;
+  customerLocation?: { lat: number; lng: number; address: string };
+  paid?: boolean;
 }
 
 export function getMechanicBookings(): MechanicBooking[] {
@@ -266,6 +272,16 @@ export function addMechanicBooking(b: MechanicBooking) {
   const all = getMechanicBookings();
   all.unshift(b);
   localStorage.setItem(BOOKINGS_KEY, JSON.stringify(all));
+}
+
+export function updateMechanicBooking(id: string, patch: Partial<MechanicBooking>) {
+  const all = getMechanicBookings().map((b) => (b.id === id ? { ...b, ...patch } : b));
+  localStorage.setItem(BOOKINGS_KEY, JSON.stringify(all));
+  return all.find((b) => b.id === id) || null;
+}
+
+export function getShopBookings(shopId: string): MechanicBooking[] {
+  return getMechanicBookings().filter((b) => b.shopId === shopId);
 }
 
 export function maskContact(value: string) {
