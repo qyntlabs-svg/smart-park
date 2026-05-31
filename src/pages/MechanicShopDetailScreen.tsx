@@ -143,6 +143,12 @@ const MechanicShopDetailScreen = () => {
           >
             Back to shop
           </button>
+          <button
+            className="w-full h-11 rounded-xl bg-primary/10 text-primary text-body-sm font-semibold"
+            onClick={() => navigate("/my-service-bookings")}
+          >
+            View all my bookings
+          </button>
         </div>
       </div>
     );
