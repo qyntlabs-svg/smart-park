@@ -64,6 +64,7 @@ import MechanicDashboardScreen from "./pages/MechanicDashboardScreen";
 import MechanicShopDetailScreen from "./pages/MechanicShopDetailScreen";
 import MechanicBookingsScreen from "./pages/MechanicBookingsScreen";
 import MechanicReviewsScreen from "./pages/MechanicReviewsScreen";
+import ConsumerMechanicBookingsScreen from "./pages/ConsumerMechanicBookingsScreen";
 
 import AdminDashboardScreen from "./pages/AdminDashboardScreen";
 import RolePickerScreen from "./pages/RolePickerScreen";
@@ -442,6 +443,14 @@ const AnimatedRoutes = () => {
           element={
             <ProtectedRoute role="user">
               <MechanicShopDetailScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-service-bookings"
+          element={
+            <ProtectedRoute role="user">
+              <ConsumerMechanicBookingsScreen />
             </ProtectedRoute>
           }
         />
