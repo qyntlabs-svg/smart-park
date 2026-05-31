@@ -1,26 +1,56 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Wrench, Star, MapPin, EyeOff, ChevronRight } from "lucide-react";
+import { Wrench, Star, MapPin, EyeOff, ChevronRight, Search, ClipboardList } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { getPublicShops, maskContact, VEHICLE_CATEGORIES, VehicleCategory } from "@/lib/mechanic";
 import { useMemo, useState } from "react";
+import { Input } from "@/components/ui/input";
 
 const MechanicsScreen = () => {
   const navigate = useNavigate();
   const shops = useMemo(() => getPublicShops(), []);
   const [filter, setFilter] = useState<VehicleCategory | "all">("all");
+  const [query, setQuery] = useState("");
 
-  const filtered = filter === "all" ? shops : shops.filter((s) => s.categories.includes(filter));
+  const byCategory = filter === "all" ? shops : shops.filter((s) => s.categories.includes(filter));
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? byCategory.filter(
+        (s) =>
+          s.shopName.toLowerCase().includes(q) ||
+          s.address.toLowerCase().includes(q) ||
+          s.services.some((sv) => sv.name.toLowerCase().includes(q)),
+      )
+    : byCategory;
 
   return (
     <div className="min-h-[100dvh] w-full max-w-md mx-auto bg-background flex flex-col">
       {/* Header */}
-      <header className="flex items-center h-[60px] px-4 pt-safe bg-card border-b border-border">
+      <header className="flex items-center justify-between h-[60px] px-4 pt-safe bg-card border-b border-border">
         <div className="flex items-center gap-2">
           <Wrench className="w-5 h-5 text-primary" />
           <h1 className="text-body font-bold text-foreground">Mechanics Nearby</h1>
         </div>
+        <button
+          onClick={() => navigate("/my-service-bookings")}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-caption font-semibold"
+        >
+          <ClipboardList className="w-3.5 h-3.5" /> My Bookings
+        </button>
       </header>
+
+      {/* Search */}
+      <div className="px-4 pt-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search shop, area, or service…"
+            className="h-11 pl-9 rounded-xl"
+          />
+        </div>
+      </div>
 
       {/* Category filter */}
       <div className="flex gap-2 overflow-x-auto scrollbar-hide px-4 py-3 border-b border-border">
