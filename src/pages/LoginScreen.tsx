@@ -1,119 +1,58 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Car, ArrowLeft, Loader2 } from "lucide-react";
+import { Car, ArrowLeft, ChevronDown } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
-import api from "@/lib/axios";
 import logo from "@/assets/logo.png";
-
-declare global {
-  interface Window {
-    initSendOTP?: (config: Record<string, unknown>) => void;
-  }
-}
+import { MobileButton } from "@/components/ui/mobile-button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 const LoginScreen = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const role = (location.state as any)?.role as string | undefined;
 
-  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
-  const [widgetReady, setWidgetReady] = useState(false);
-  // Ref to track if success already fired — prevents failure from overwriting
-  const successFired = useRef(false);
 
   const setAuth = useAuthStore((s) => s.setAuth);
   const setActiveRole = useAuthStore((s) => s.setActiveRole);
 
-  // Load MSG91 widget script once
-  useEffect(() => {
-    if (document.getElementById("msg91-widget-script")) {
-      setWidgetReady(true);
+  const handleSend = () => {
+    if (!/^\d{10}$/.test(phone)) {
+      setError("Enter a valid 10-digit number");
       return;
     }
-    const script = document.createElement("script");
-    script.id = "msg91-widget-script";
-    script.src = "https://verify.msg91.com/otp-provider.js";
-    script.async = true;
-    script.onload = () => setWidgetReady(true);
-    script.onerror = () =>
-      setError("Failed to load OTP widget. Check your connection.");
-    document.head.appendChild(script);
-  }, []);
-
-  // Launch the MSG91 widget once script is ready
-  useEffect(() => {
-    if (!widgetReady || !window.initSendOTP) return;
-
-    window.initSendOTP({
-      widgetId: import.meta.env.VITE_MSG91_WIDGET_ID as string,
-      tokenAuth: import.meta.env.VITE_MSG91_TOKEN_AUTH as string,
-      exposeMethods: false,
-      success: (data: { message?: string; type?: string }) => {
-        successFired.current = true;
-        const accessToken = data.message;
-        if (!accessToken) {
-          setError("OTP verification failed — no token received.");
-          return;
-        }
-        handleVerify(accessToken);
-      },
-      failure: (err: unknown) => {
-        if (successFired.current) return;
-        console.error("[MSG91] widget failure:", err);
-        setError("OTP verification failed. Please try again.");
-      },
-    });
-  }, [widgetReady]);
-
-  const handleVerify = async (accessToken: string) => {
-    setLoading(true);
     setError("");
-    try {
-      const { data } = await api.post("/auth/verify-msg91", { accessToken });
+    setStep("otp");
+    toast.success("OTP sent (use 123456 for demo)");
+  };
 
-      setAuth(data.token, data.user);
-
-      const roles: string[] = data.user.roles ?? [data.user.role];
-
-      if (roles.includes("admin")) {
-        navigate("/admin/dashboard", { replace: true });
-        return;
-      }
-
-      if (role === "user") {
-        setActiveRole("user");
-        if (data.user.is_new_user) {
-          navigate("/add-vehicle", { replace: true, state: { first: true } });
-          return;
-        }
-        navigate("/home", { replace: true });
-        return;
-      }
-
-      if (roles.includes("user") && roles.includes("partner")) {
-        navigate("/role-picker", {
-          replace: true,
-          state: { token: data.token },
-        });
-        return;
-      }
-
-      if (data.user.is_new_user) {
-        navigate("/add-vehicle", { replace: true, state: { first: true } });
-        return;
-      }
-
-      navigate("/home", { replace: true });
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.error?.message ||
-          "Verification failed. Please try again.",
-      );
-    } finally {
-      setLoading(false);
+  const handleVerify = () => {
+    if (otp !== "123456") {
+      setError("Invalid OTP. Use 123456.");
+      return;
     }
+    setError("");
+    const isNew = !localStorage.getItem(`consumer-onboarded-${phone}`);
+    localStorage.setItem(`consumer-onboarded-${phone}`, "1");
+    setAuth("demo-token-" + phone, {
+      id: "user-" + phone,
+      phone,
+      name: null,
+      role: "user",
+      roles: ["user"],
+      is_new_user: isNew,
+    });
+    setActiveRole("user");
+    if (isNew) {
+      navigate("/add-vehicle", { replace: true, state: { first: true } });
+      return;
+    }
+    navigate("/home", { replace: true });
   };
 
   return (
@@ -121,7 +60,7 @@ const LoginScreen = () => {
       <div className="w-full max-w-md mx-auto flex flex-col px-6 pt-safe">
         {/* Back */}
         <button
-          onClick={() => navigate("/role-select")}
+          onClick={() => (step === "otp" ? setStep("phone") : navigate("/role-select"))}
           className="mt-4 flex items-center gap-1 text-muted-foreground w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -163,9 +102,9 @@ const LoginScreen = () => {
           transition={{ delay: 0.2 }}
           className="mt-1 text-body-sm text-muted-foreground"
         >
-          {role === "partner"
-            ? "Sign in to manage your parking facility"
-            : "Sign in to find and book parking"}
+          {step === "phone"
+            ? "Sign in to find and book parking"
+            : `Enter the OTP sent to +91 ${phone}`}
         </motion.p>
 
         {/* Status area */}
@@ -173,31 +112,44 @@ const LoginScreen = () => {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-8 w-full bg-card rounded-2xl p-6 shadow-lg border border-border"
+          className="mt-8 w-full bg-card rounded-2xl p-6 shadow-lg border border-border space-y-4"
         >
-          {!widgetReady ? (
-            <div className="flex flex-col items-center gap-3 py-4">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-body-sm text-muted-foreground">
-                Loading OTP widget…
-              </p>
-            </div>
-          ) : loading ? (
-            <div className="flex flex-col items-center gap-3 py-4">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-body-sm text-muted-foreground">Verifying…</p>
-            </div>
+          {step === "phone" ? (
+            <>
+              <label className="text-body-sm font-semibold text-foreground">Mobile Number</label>
+              <div className="flex gap-3">
+                <button className="flex items-center gap-1 h-14 px-3 rounded-xl border border-border bg-secondary text-body-sm font-medium text-foreground">
+                  🇮🇳 +91 <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                </button>
+                <Input
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  placeholder="98765 43210"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  className="h-14 rounded-xl text-body font-medium px-4"
+                />
+              </div>
+              <MobileButton fullWidth onClick={handleSend}>Send OTP</MobileButton>
+            </>
           ) : (
-            <div className="text-center py-2">
-              <p className="text-body-sm text-muted-foreground">
-                A verification popup will appear to enter your mobile number and
-                OTP.
-              </p>
-              {error && (
-                <p className="mt-3 text-body-sm text-destructive">{error}</p>
-              )}
-            </div>
+            <>
+              <label className="text-body-sm font-semibold text-foreground">OTP</label>
+              <Input
+                type="tel"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="123456"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                className="h-14 rounded-xl text-body font-medium px-4 text-center tracking-widest"
+              />
+              <p className="text-caption text-muted-foreground">Demo OTP: 123456</p>
+              <MobileButton fullWidth onClick={handleVerify}>Verify & Continue</MobileButton>
+            </>
           )}
+          {error && <p className="text-body-sm text-destructive">{error}</p>}
         </motion.div>
 
         <motion.p
