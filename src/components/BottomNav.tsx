@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const tabs = [
   { key: "/home", icon: Home, label: "Home", locked: false },
-  { key: "/mechanics", icon: Wrench, label: "Mechanics", locked: true },
+  { key: "/mechanics", icon: Wrench, label: "Mechanics", locked: false },
   { key: "/shop", icon: ShoppingBag, label: "Shop", locked: true },
   { key: "/profile", icon: User, label: "Profile", locked: false },
 ];

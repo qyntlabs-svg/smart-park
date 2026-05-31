@@ -282,6 +282,42 @@ export function updateMechanicBooking(id: string, patch: Partial<MechanicBooking
   return all.find((b) => b.id === id) || null;
 }
 
+export function getConsumerBookings(phone: string): MechanicBooking[] {
+  if (!phone) return [];
+  return getMechanicBookings().filter((b) => b.customerPhone === phone);
+}
+
+export function addReviewToShop(
+  shopId: string,
+  review: Omit<MechanicReview, "id" | "date">,
+) {
+  const list = getPublicShops();
+  const idx = list.findIndex((s) => s.id === shopId);
+  if (idx === -1) return;
+  const shop = list[idx];
+  const newReview: MechanicReview = {
+    ...review,
+    id: `rv_${Date.now()}`,
+    date: "Just now",
+  };
+  const reviews = [newReview, ...(shop.reviews || [])];
+  const reviewCount = reviews.length;
+  const rating = reviews.reduce((a, r) => a + r.rating, 0) / reviewCount;
+  const updated: MechanicShop = {
+    ...shop,
+    reviews,
+    reviewCount,
+    rating: Math.round(rating * 10) / 10,
+  };
+  list[idx] = updated;
+  localStorage.setItem(PUBLIC_SHOPS_KEY, JSON.stringify(list));
+  // Mirror to mechanic's own shop record if it matches
+  const own = getMechanicShop();
+  if (own && own.id === shopId) {
+    localStorage.setItem(SHOP_KEY, JSON.stringify(updated));
+  }
+}
+
 export function getShopBookings(shopId: string): MechanicBooking[] {
   const existing = getMechanicBookings().filter((b) => b.shopId === shopId);
   if (existing.length > 0) return existing;
