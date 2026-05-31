@@ -149,7 +149,6 @@ const ConsumerMechanicBookingsScreen = () => {
           const badge = statusBadge(b.status);
           const shop = shopOf(b.shopId);
           const canPay = b.status === "accepted" && !b.paid;
-          const canReview = b.status === "completed" && !shop?.reviews.some((r) => r.user === (user?.name || "Customer") && r.comment.length > 0 && b.id.startsWith("mb_") ? false : false);
           return (
             <div key={b.id} className="p-4 rounded-2xl bg-card border border-border space-y-3">
               <div className="flex items-start justify-between gap-2">
