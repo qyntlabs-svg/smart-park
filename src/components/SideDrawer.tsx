@@ -23,7 +23,7 @@ interface SideDrawerProps {
 const menuItems = [
   { icon: ClipboardList, label: "Booking History", route: "/booking-history" },
   { icon: Car, label: "My Vehicles", route: "/vehicles" },
-  { icon: Wrench, label: "Mechanics", route: "/mechanics", locked: true },
+  { icon: Wrench, label: "Mechanics", route: "/mechanics", locked: false },
   { icon: ShoppingBag, label: "Shop", route: "/shop", locked: true },
   { divider: true },
   { icon: Star, label: "Rate Us", route: "__rate" },
