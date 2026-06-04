@@ -14,6 +14,7 @@ import {
   MessageCircle,
   FileText,
   Phone,
+  LogIn,
 } from "lucide-react";
 import {
   getMechanicAuth,
@@ -23,6 +24,7 @@ import {
   updateWorker,
   pushNotification,
   addWorker,
+  setWorkerAuth,
   type MechanicWorker,
 } from "@/lib/mechanic";
 import { toast } from "sonner";
@@ -175,6 +177,12 @@ const MechanicWorkersScreen = () => {
     setTick((t) => t + 1);
   };
 
+  const viewAsWorker = (w: MechanicWorker) => {
+    setWorkerAuth({ workerId: w.id });
+    if (w.status === "approved") navigate("/worker/dashboard");
+    else navigate("/worker/pending");
+  };
+
   return (
     <div className="min-h-[100dvh] w-full max-w-md mx-auto bg-background flex flex-col">
       <header className="flex items-center h-[60px] px-4 pt-safe bg-card border-b border-border">
@@ -300,6 +308,13 @@ const MechanicWorkersScreen = () => {
                 </button>
               </div>
             )}
+
+            <button
+              onClick={() => viewAsWorker(w)}
+              className="w-full h-9 rounded-lg bg-secondary text-foreground text-caption font-semibold flex items-center justify-center gap-1"
+            >
+              <LogIn className="w-3.5 h-3.5" /> View as {w.name?.split(" ")[0] || "worker"}
+            </button>
           </div>
         ))}
       </div>
