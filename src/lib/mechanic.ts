@@ -28,6 +28,8 @@ export interface MechanicReview {
   date: string;
   reply?: string;
   replyDate?: string;
+  workerId?: string;
+  workerName?: string;
 }
 
 export interface MechanicShop {
@@ -46,6 +48,259 @@ export interface MechanicShop {
   reviews: MechanicReview[];
   open: boolean;
   upiId?: string;
+}
+
+// ---------------- Workers ----------------
+
+export type WorkerStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "suspended"
+  | "removed"
+  | "self_suspended";
+
+export interface MechanicWorker {
+  id: string;
+  shopId: string;
+  shopName: string;
+  name: string;
+  phone: string;
+  aadhaarUrl?: string; // data URL (mock)
+  panUrl?: string; // data URL (mock)
+  extraDocs?: string[]; // additional data URLs
+  status: WorkerStatus;
+  createdAt: string;
+  lat?: number;
+  lng?: number;
+}
+
+export interface WorkerInvite {
+  token: string;
+  shopId: string;
+  shopName: string;
+  createdAt: string;
+  expiresAt?: string;
+}
+
+export interface MobilePricing {
+  labourPerService: number; // base labour per selected service
+  travelPerKm: number;
+  serviceCharge: number; // platform service charge
+  nightSurchargePct: number; // % applied if 9pm–6am
+}
+
+export interface AppNotification {
+  id: string;
+  audience: "owner" | "worker" | "consumer";
+  audienceId: string; // shopId | workerId | consumerPhone
+  title: string;
+  body: string;
+  createdAt: string;
+  read?: boolean;
+}
+
+const WORKERS_KEY = "mechanicWorkers";
+const INVITES_KEY = "mechanicWorkerInvites";
+const WORKER_AUTH_KEY = "workerAuth";
+const PRICING_KEY = "mechanicMobilePricing";
+const NOTIFS_KEY = "mechanicAppNotifications";
+
+const DEFAULT_PRICING: MobilePricing = {
+  labourPerService: 250,
+  travelPerKm: 12,
+  serviceCharge: 49,
+  nightSurchargePct: 25,
+};
+
+export function getMobilePricing(): MobilePricing {
+  try {
+    const raw = localStorage.getItem(PRICING_KEY);
+    if (raw) return { ...DEFAULT_PRICING, ...JSON.parse(raw) };
+  } catch {/* */}
+  return DEFAULT_PRICING;
+}
+export function setMobilePricing(p: MobilePricing) {
+  localStorage.setItem(PRICING_KEY, JSON.stringify(p));
+}
+
+export function isNightTime(d = new Date()): boolean {
+  const h = d.getHours();
+  return h >= 21 || h < 6;
+}
+
+export interface MobileQuote {
+  labour: number;
+  travel: number;
+  service: number;
+  nightSurcharge: number;
+  total: number;
+  isNight: boolean;
+  distanceKm: number;
+  services: string[];
+}
+
+export function calcMobileQuote(
+  serviceNames: string[],
+  distanceKm: number,
+  at: Date = new Date(),
+): MobileQuote {
+  const p = getMobilePricing();
+  const labour = Math.round(p.labourPerService * Math.max(1, serviceNames.length));
+  const travel = Math.round(p.travelPerKm * Math.max(0, distanceKm));
+  const service = p.serviceCharge;
+  const subtotal = labour + travel + service;
+  const isNight = isNightTime(at);
+  const nightSurcharge = isNight ? Math.round((subtotal * p.nightSurchargePct) / 100) : 0;
+  return {
+    labour,
+    travel,
+    service,
+    nightSurcharge,
+    total: subtotal + nightSurcharge,
+    isNight,
+    distanceKm: Math.round(distanceKm * 10) / 10,
+    services: serviceNames,
+  };
+}
+
+// Predefined catalogue of mobile amenity services (admin-controlled, mocked here)
+export const MOBILE_SERVICE_CATALOGUE: { id: string; name: string; emoji: string }[] = [
+  { id: "oil_change", name: "Oil Change", emoji: "🛢️" },
+  { id: "tyre_check", name: "Tyre Check & Air", emoji: "🛞" },
+  { id: "battery_replace", name: "Battery Replacement", emoji: "🔋" },
+  { id: "battery_jumpstart", name: "Battery Jumpstart", emoji: "⚡" },
+  { id: "brake_inspect", name: "Brake Inspection", emoji: "🛑" },
+  { id: "ac_recharge", name: "AC Gas Recharge", emoji: "❄️" },
+  { id: "wash", name: "Doorstep Wash", emoji: "🧼" },
+  { id: "diagnostic", name: "Diagnostic Scan", emoji: "🩺" },
+];
+
+// ---------- Workers store ----------
+export function getAllWorkers(): MechanicWorker[] {
+  try {
+    const raw = localStorage.getItem(WORKERS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+function writeWorkers(list: MechanicWorker[]) {
+  localStorage.setItem(WORKERS_KEY, JSON.stringify(list));
+}
+export function getWorkersForShop(shopId: string): MechanicWorker[] {
+  return getAllWorkers().filter((w) => w.shopId === shopId && w.status !== "removed");
+}
+export function getWorkerById(id: string): MechanicWorker | null {
+  return getAllWorkers().find((w) => w.id === id) || null;
+}
+export function addWorker(w: MechanicWorker) {
+  const list = getAllWorkers();
+  list.unshift(w);
+  writeWorkers(list);
+}
+export function updateWorker(id: string, patch: Partial<MechanicWorker>) {
+  const list = getAllWorkers().map((w) => (w.id === id ? { ...w, ...patch } : w));
+  writeWorkers(list);
+  return list.find((w) => w.id === id) || null;
+}
+
+// ---------- Invites ----------
+export function getInvites(): WorkerInvite[] {
+  try {
+    const raw = localStorage.getItem(INVITES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+export function createWorkerInvite(shopId: string, shopName: string, expiresInHours = 72): WorkerInvite {
+  const token = `inv_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36)}`;
+  const invite: WorkerInvite = {
+    token,
+    shopId,
+    shopName,
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + expiresInHours * 3600_000).toISOString(),
+  };
+  const list = getInvites();
+  list.unshift(invite);
+  localStorage.setItem(INVITES_KEY, JSON.stringify(list));
+  return invite;
+}
+export function getInvite(token: string): WorkerInvite | null {
+  return getInvites().find((i) => i.token === token) || null;
+}
+
+// ---------- Worker auth (mock) ----------
+export interface WorkerAuth {
+  workerId: string;
+}
+export function getWorkerAuth(): WorkerAuth | null {
+  try {
+    const raw = localStorage.getItem(WORKER_AUTH_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+export function setWorkerAuth(a: WorkerAuth | null) {
+  if (!a) localStorage.removeItem(WORKER_AUTH_KEY);
+  else localStorage.setItem(WORKER_AUTH_KEY, JSON.stringify(a));
+}
+
+// ---------- Notifications ----------
+export function getNotifications(audience: AppNotification["audience"], audienceId: string): AppNotification[] {
+  try {
+    const raw = localStorage.getItem(NOTIFS_KEY);
+    const all: AppNotification[] = raw ? JSON.parse(raw) : [];
+    return all.filter((n) => n.audience === audience && n.audienceId === audienceId);
+  } catch {
+    return [];
+  }
+}
+export function pushNotification(n: Omit<AppNotification, "id" | "createdAt">) {
+  try {
+    const raw = localStorage.getItem(NOTIFS_KEY);
+    const all: AppNotification[] = raw ? JSON.parse(raw) : [];
+    all.unshift({ ...n, id: `n_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`, createdAt: new Date().toISOString() });
+    localStorage.setItem(NOTIFS_KEY, JSON.stringify(all.slice(0, 200)));
+  } catch {/* */}
+}
+export function markAllNotificationsRead(audience: AppNotification["audience"], audienceId: string) {
+  try {
+    const raw = localStorage.getItem(NOTIFS_KEY);
+    const all: AppNotification[] = raw ? JSON.parse(raw) : [];
+    const next = all.map((n) =>
+      n.audience === audience && n.audienceId === audienceId ? { ...n, read: true } : n,
+    );
+    localStorage.setItem(NOTIFS_KEY, JSON.stringify(next));
+  } catch {/* */}
+}
+
+// ---------- Geo ----------
+export function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+export const DISPATCH_RADIUS_KM = 12;
+
+/** Workers eligible for a given consumer location */
+export function getEligibleWorkers(loc: { lat: number; lng: number }): MechanicWorker[] {
+  return getAllWorkers().filter(
+    (w) =>
+      w.status === "approved" &&
+      typeof w.lat === "number" &&
+      typeof w.lng === "number" &&
+      haversineKm(loc, { lat: w.lat!, lng: w.lng! }) <= DISPATCH_RADIUS_KM,
+  );
 }
 
 export type VehicleCategory = "bike" | "car" | "auto" | "commercial" | "ev" | "bicycle";
