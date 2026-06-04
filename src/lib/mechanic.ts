@@ -507,13 +507,32 @@ export interface MechanicBooking {
   service: string;
   price: number;
   date: string;
-  status: "pending" | "accepted" | "rejected" | "completed";
+  status:
+    | "pending"
+    | "accepted"
+    | "rejected"
+    | "completed"
+    | "cancelled"
+    | "searching"
+    | "assigned"
+    | "on_the_way"
+    | "in_progress";
   contactRevealed: boolean;
   serviceType: "shop" | "doorstep";
+  jobType?: "in_shop" | "mobile";
   customerName: string;
   customerPhone: string;
   customerLocation?: { lat: number; lng: number; address: string };
   paid?: boolean;
+  workerId?: string;
+  workerName?: string;
+  priceBreakdown?: {
+    labour: number;
+    travel: number;
+    service: number;
+    nightSurcharge: number;
+  };
+  services?: string[];
 }
 
 export function getMechanicBookings(): MechanicBooking[] {
