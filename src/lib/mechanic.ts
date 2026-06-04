@@ -303,6 +303,55 @@ export function getEligibleWorkers(loc: { lat: number; lng: number }): MechanicW
   );
 }
 
+/** First-accept-wins: worker accepts a searching booking */
+export function workerAcceptBooking(bookingId: string, worker: MechanicWorker): MechanicBooking | null {
+  const all = getMechanicBookings();
+  const idx = all.findIndex((b) => b.id === bookingId);
+  if (idx === -1) return null;
+  if (all[idx].status !== "searching") return null; // already taken
+  const updated: MechanicBooking = {
+    ...all[idx],
+    status: "assigned",
+    workerId: worker.id,
+    workerName: worker.name,
+    contactRevealed: true,
+  };
+  all[idx] = updated;
+  localStorage.setItem(BOOKINGS_KEY, JSON.stringify(all));
+  pushNotification({
+    audience: "consumer",
+    audienceId: updated.customerPhone,
+    title: "Mechanic found",
+    body: `${worker.name} accepted your request for ${updated.service}.`,
+  });
+  pushNotification({
+    audience: "owner",
+    audienceId: updated.shopId,
+    title: "Worker accepted a job",
+    body: `${worker.name} accepted ${updated.service}.`,
+  });
+  return updated;
+}
+
+/** Available mobile requests for a worker (searching status, within radius of worker) */
+export function getAvailableMobileRequests(worker: MechanicWorker): MechanicBooking[] {
+  if (typeof worker.lat !== "number" || typeof worker.lng !== "number") return [];
+  return getMechanicBookings().filter((b) => {
+    if (b.status !== "searching") return false;
+    if (b.jobType !== "mobile") return false;
+    if (!b.customerLocation) return false;
+    return haversineKm(
+      { lat: worker.lat!, lng: worker.lng! },
+      { lat: b.customerLocation.lat, lng: b.customerLocation.lng },
+    ) <= DISPATCH_RADIUS_KM;
+  });
+}
+
+/** Bookings the worker has been assigned */
+export function getWorkerAssignedBookings(workerId: string): MechanicBooking[] {
+  return getMechanicBookings().filter((b) => b.workerId === workerId);
+}
+
 export type VehicleCategory = "bike" | "car" | "auto" | "commercial" | "ev" | "bicycle";
 
 export const VEHICLE_CATEGORIES: {
