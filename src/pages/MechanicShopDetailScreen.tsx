@@ -271,7 +271,14 @@ const MechanicShopDetailScreen = () => {
                   </div>
                 </div>
                 <p className="text-body-sm text-muted-foreground mt-1">{r.comment}</p>
-                <p className="text-caption text-muted-foreground mt-1">{r.date}</p>
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-caption text-muted-foreground">{r.date}</p>
+                  {r.workerName && (
+                    <span className="text-caption px-2 py-0.5 rounded-md bg-primary/10 text-primary font-semibold">
+                      Serviced by {r.workerName}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
