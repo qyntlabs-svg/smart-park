@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Wrench, Star, MapPin, EyeOff, ChevronRight, Search, ClipboardList } from "lucide-react";
+import { Wrench, Star, MapPin, EyeOff, ChevronRight, Search, ClipboardList, Bike } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { getPublicShops, maskContact, VEHICLE_CATEGORIES, VehicleCategory } from "@/lib/mechanic";
 import { useMemo, useState } from "react";
@@ -38,6 +38,23 @@ const MechanicsScreen = () => {
           <ClipboardList className="w-3.5 h-3.5" /> My Bookings
         </button>
       </header>
+
+      {/* Mobile mechanic CTA */}
+      <div className="px-4 pt-3">
+        <button
+          onClick={() => navigate("/mobile-mechanic")}
+          className="w-full p-4 rounded-2xl bg-gradient-to-r from-primary/15 to-primary/5 border border-primary/30 flex items-center gap-3 text-left"
+        >
+          <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
+            <Bike className="w-5 h-5" />
+          </div>
+          <div className="flex-1">
+            <p className="text-body-sm font-bold text-foreground">Need a mechanic at your doorstep?</p>
+            <p className="text-caption text-muted-foreground">Request a mobile mechanic — first available accepts</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-primary" />
+        </button>
+      </div>
 
       {/* Search */}
       <div className="px-4 pt-3">
