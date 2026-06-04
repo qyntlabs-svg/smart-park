@@ -215,13 +215,24 @@ export function getInvites(): WorkerInvite[] {
   }
 }
 export function createWorkerInvite(shopId: string, shopName: string, expiresInHours = 72): WorkerInvite {
-  const token = `inv_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36)}`;
+  // Encode shop info into the token so the link works on any device/browser
+  // even when localStorage doesn't have a record of the invite.
+  const expiresAt = new Date(Date.now() + expiresInHours * 3600_000).toISOString();
+  const payload = { s: shopId, n: shopName, e: expiresAt };
+  let encoded = "";
+  try {
+    encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
+      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  } catch {
+    encoded = Math.random().toString(36).slice(2, 10);
+  }
+  const token = `inv_${encoded}`;
   const invite: WorkerInvite = {
     token,
     shopId,
     shopName,
     createdAt: new Date().toISOString(),
-    expiresAt: new Date(Date.now() + expiresInHours * 3600_000).toISOString(),
+    expiresAt,
   };
   const list = getInvites();
   list.unshift(invite);
@@ -229,7 +240,27 @@ export function createWorkerInvite(shopId: string, shopName: string, expiresInHo
   return invite;
 }
 export function getInvite(token: string): WorkerInvite | null {
-  return getInvites().find((i) => i.token === token) || null;
+  const local = getInvites().find((i) => i.token === token);
+  if (local) return local;
+  // Fallback: decode self-contained token so the invite works across devices.
+  if (token?.startsWith("inv_")) {
+    try {
+      const raw = token.slice(4).replace(/-/g, "+").replace(/_/g, "/");
+      const padded = raw + "=".repeat((4 - (raw.length % 4)) % 4);
+      const json = decodeURIComponent(escape(atob(padded)));
+      const payload = JSON.parse(json) as { s: string; n: string; e?: string };
+      if (payload?.s && payload?.n) {
+        return {
+          token,
+          shopId: payload.s,
+          shopName: payload.n,
+          createdAt: new Date().toISOString(),
+          expiresAt: payload.e,
+        };
+      }
+    } catch {/* not an encoded token */}
+  }
+  return null;
 }
 
 // ---------- Worker auth (mock) ----------
