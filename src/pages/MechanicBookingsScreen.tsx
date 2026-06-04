@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Phone, User, Check, X, QrCode, Navigation, CheckCircle2, Clock, Store, Bike } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, User, Check, X, QrCode, Navigation, CheckCircle2, Clock, Store, Bike, Calendar } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { QRCodeSVG } from "qrcode.react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import {
@@ -20,6 +21,13 @@ const TAB_LABELS = [
 
 type TabKey = (typeof TAB_LABELS)[number]["key"];
 
+const JOB_FILTERS = [
+  { key: "all", label: "All" },
+  { key: "in_shop", label: "In-shop" },
+  { key: "mobile", label: "Mobile" },
+] as const;
+type JobFilter = (typeof JOB_FILTERS)[number]["key"];
+
 const MechanicBookingsScreen = () => {
   const navigate = useNavigate();
   const auth = getMechanicAuth();
@@ -27,6 +35,9 @@ const MechanicBookingsScreen = () => {
   const [tab, setTab] = useState<TabKey>("pending");
   const [tick, setTick] = useState(0);
   const [qrFor, setQrFor] = useState<MechanicBooking | null>(null);
+  const [jobFilter, setJobFilter] = useState<JobFilter>("all");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   useEffect(() => {
     if (!auth) return navigate("/mechanic/login", { replace: true });
@@ -45,15 +56,30 @@ const MechanicBookingsScreen = () => {
 
   if (!shop) return null;
 
+  const inferJobType = (b: MechanicBooking) =>
+    b.jobType || (b.serviceType === "doorstep" ? "mobile" : "in_shop");
+
+  const filteredAll = bookings.filter((b) => {
+    if (jobFilter !== "all" && inferJobType(b) !== jobFilter) return false;
+    const d = new Date(b.date).getTime();
+    if (fromDate && d < new Date(fromDate).getTime()) return false;
+    if (toDate && d > new Date(toDate).getTime() + 86_400_000) return false;
+    return true;
+  });
+
   const counts = {
-    pending: bookings.filter((b) => b.status === "pending").length,
-    accepted: bookings.filter((b) => b.status === "accepted").length,
-    completed: bookings.filter((b) => b.status === "completed" || b.status === "rejected").length,
+    pending: filteredAll.filter((b) => b.status === "pending").length,
+    accepted: filteredAll.filter((b) => b.status === "accepted").length,
+    completed: filteredAll.filter((b) => b.status === "completed" || b.status === "rejected" || b.status === "cancelled").length,
   };
 
-  const list = bookings.filter((b) =>
+  const inShopCount = filteredAll.filter((b) => inferJobType(b) === "in_shop").length;
+  const mobileCount = filteredAll.filter((b) => inferJobType(b) === "mobile").length;
+  const cancelledCount = filteredAll.filter((b) => b.status === "cancelled" || b.status === "rejected").length;
+
+  const list = filteredAll.filter((b) =>
     tab === "completed"
-      ? b.status === "completed" || b.status === "rejected"
+      ? b.status === "completed" || b.status === "rejected" || b.status === "cancelled"
       : b.status === tab,
   );
 
@@ -90,6 +116,42 @@ const MechanicBookingsScreen = () => {
         <h1 className="flex-1 text-center text-body font-bold pr-11">Bookings</h1>
       </header>
 
+      {/* Summary metric cards */}
+      <div className="grid grid-cols-2 gap-2 px-4 pt-3">
+        <Metric label="Total" value={filteredAll.length} tone="primary" />
+        <Metric label="In-shop" value={inShopCount} tone="muted" />
+        <Metric label="Mobile" value={mobileCount} tone="muted" />
+        <Metric label="Completed" value={counts.completed - cancelledCount} tone="success" />
+        <Metric label="Pending" value={counts.pending} tone="warning" />
+        <Metric label="Cancelled" value={cancelledCount} tone="destructive" />
+      </div>
+
+      {/* Filters */}
+      <div className="px-4 pt-3 space-y-2">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {JOB_FILTERS.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setJobFilter(f.key)}
+              className={`px-3 py-1.5 rounded-full text-caption font-semibold whitespace-nowrap ${
+                jobFilter === f.key ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2 items-center">
+          <Calendar className="w-4 h-4 text-muted-foreground" />
+          <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-9 rounded-lg flex-1" />
+          <span className="text-caption text-muted-foreground">→</span>
+          <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-9 rounded-lg flex-1" />
+          {(fromDate || toDate) && (
+            <button onClick={() => { setFromDate(""); setToDate(""); }} className="text-caption text-primary font-semibold">Clear</button>
+          )}
+        </div>
+      </div>
+
       <div className="flex bg-secondary mx-4 mt-3 rounded-xl p-1">
         {TAB_LABELS.map((t) => (
           <button
@@ -120,8 +182,12 @@ const MechanicBookingsScreen = () => {
                   <p className="text-caption text-muted-foreground flex items-center gap-1">
                     <Phone className="w-3 h-3" /> {b.contactRevealed ? b.customerPhone : "Hidden until accepted"}
                   </p>
+                  {b.workerName && (
+                    <p className="text-caption text-muted-foreground">Worker: <span className="font-semibold text-foreground">{b.workerName}</span></p>
+                  )}
                 </div>
               </div>
+              <div className="flex flex-col items-end gap-1">
               <span className={`px-2 py-0.5 rounded-md text-caption font-semibold ${
                 b.status === "pending" ? "bg-warning/10 text-warning"
                 : b.status === "accepted" ? "bg-primary/10 text-primary"
@@ -130,6 +196,12 @@ const MechanicBookingsScreen = () => {
               }`}>
                 <Clock className="inline w-3 h-3 mr-1" />{b.status}
               </span>
+              <span className={`px-2 py-0.5 rounded-md text-caption font-semibold ${
+                inferJobType(b) === "mobile" ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
+              }`}>
+                {inferJobType(b) === "mobile" ? <><Bike className="inline w-3 h-3 mr-1" />Mobile</> : <><Store className="inline w-3 h-3 mr-1" />In-shop</>}
+              </span>
+              </div>
             </div>
 
             <div className="text-body-sm">
