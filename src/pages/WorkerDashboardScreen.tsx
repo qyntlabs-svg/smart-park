@@ -26,9 +26,11 @@ import {
   haversineKm,
   pushNotification,
   getNotifications,
+  addMechanicBooking,
   type MechanicBooking,
 } from "@/lib/mechanic";
 import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 
 const TABS = [
   { key: "new", label: "New" },
@@ -113,6 +115,113 @@ const WorkerDashboardScreen = () => {
     );
   };
 
+  const seedDemo = () => {
+    if (!worker) return;
+    const now = Date.now();
+    const near = (jitter = 0.02) => ({
+      lat: (worker.lat ?? 12.92) + (Math.random() - 0.5) * jitter,
+      lng: (worker.lng ?? 80.12) + (Math.random() - 0.5) * jitter,
+    });
+    const demos: MechanicBooking[] = [
+      {
+        id: `mb_demo_${now}_1`,
+        shopId: worker.shopId,
+        shopName: worker.shopName,
+        service: "Battery Jumpstart",
+        services: ["Battery Jumpstart"],
+        price: 450,
+        date: new Date().toISOString(),
+        status: "searching",
+        contactRevealed: false,
+        serviceType: "doorstep",
+        jobType: "mobile",
+        customerName: "Anitha S.",
+        customerPhone: "+91 98765 11111",
+        customerLocation: { ...near(), address: "Selaiyur Main Rd, Tambaram" },
+        priceBreakdown: { labour: 200, travel: 100, service: 150, nightSurcharge: 0 },
+      },
+      {
+        id: `mb_demo_${now}_2`,
+        shopId: worker.shopId,
+        shopName: worker.shopName,
+        service: "Tyre Check & Air",
+        services: ["Tyre Check & Air"],
+        price: 300,
+        date: new Date().toISOString(),
+        status: "searching",
+        contactRevealed: false,
+        serviceType: "doorstep",
+        jobType: "mobile",
+        customerName: "Vikram P.",
+        customerPhone: "+91 98765 22222",
+        customerLocation: { ...near(0.04), address: "Camp Rd, Selaiyur" },
+        priceBreakdown: { labour: 150, travel: 80, service: 70, nightSurcharge: 0 },
+      },
+      {
+        id: `mb_demo_${now}_3`,
+        shopId: worker.shopId,
+        shopName: worker.shopName,
+        service: "Oil Change",
+        services: ["Oil Change", "Diagnostic Scan"],
+        price: 1200,
+        date: new Date().toISOString(),
+        status: "assigned",
+        contactRevealed: true,
+        serviceType: "doorstep",
+        jobType: "mobile",
+        customerName: "Priya R.",
+        customerPhone: "+91 98765 33333",
+        customerLocation: { ...near(0.03), address: "Rajakilpakkam, Tambaram" },
+        workerId: worker.id,
+        workerName: worker.name,
+        priceBreakdown: { labour: 600, travel: 120, service: 480, nightSurcharge: 0 },
+      },
+      {
+        id: `mb_demo_${now}_4`,
+        shopId: worker.shopId,
+        shopName: worker.shopName,
+        service: "Brake Inspection",
+        services: ["Brake Inspection"],
+        price: 550,
+        date: new Date(Date.now() - 86400000).toISOString(),
+        status: "completed",
+        contactRevealed: true,
+        serviceType: "doorstep",
+        jobType: "mobile",
+        customerName: "Mohan K.",
+        customerPhone: "+91 98765 44444",
+        customerLocation: { ...near(), address: "GST Rd, Tambaram" },
+        workerId: worker.id,
+        workerName: worker.name,
+        paid: true,
+        priceBreakdown: { labour: 300, travel: 100, service: 150, nightSurcharge: 0 },
+      },
+      {
+        id: `mb_demo_${now}_5`,
+        shopId: worker.shopId,
+        shopName: worker.shopName,
+        service: "AC Gas Recharge",
+        services: ["AC Gas Recharge"],
+        price: 1800,
+        date: new Date(Date.now() - 2 * 86400000).toISOString(),
+        status: "completed",
+        contactRevealed: true,
+        serviceType: "doorstep",
+        jobType: "mobile",
+        customerName: "Deepa V.",
+        customerPhone: "+91 98765 55555",
+        customerLocation: { ...near(), address: "Chitlapakkam, Tambaram" },
+        workerId: worker.id,
+        workerName: worker.name,
+        paid: true,
+        priceBreakdown: { labour: 900, travel: 150, service: 750, nightSurcharge: 0 },
+      },
+    ];
+    demos.forEach(addMechanicBooking);
+    toast.success("Demo jobs added");
+    setTick((t) => t + 1);
+  };
+
   const list =
     tab === "new" ? available : tab === "active" ? active : done;
 
@@ -159,6 +268,14 @@ const WorkerDashboardScreen = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scrollbar-hide pb-20">
+        {assigned.length === 0 && available.length === 0 && (
+          <button
+            onClick={seedDemo}
+            className="w-full h-10 rounded-xl border border-dashed border-primary/40 text-primary text-body-sm font-semibold flex items-center justify-center gap-1"
+          >
+            <Sparkles className="w-4 h-4" /> Seed demo jobs
+          </button>
+        )}
         {list.length === 0 && (
           <p className="text-center text-body-sm text-muted-foreground py-10">
             {tab === "new" ? "No new requests near you right now." : tab === "active" ? "No active jobs." : "No completed jobs yet."}
