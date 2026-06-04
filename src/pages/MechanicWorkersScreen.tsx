@@ -22,6 +22,7 @@ import {
   createWorkerInvite,
   updateWorker,
   pushNotification,
+  addWorker,
   type MechanicWorker,
 } from "@/lib/mechanic";
 import { toast } from "sonner";
@@ -70,6 +71,40 @@ const MechanicWorkersScreen = () => {
     const inv = createWorkerInvite(shop.id, shop.shopName);
     const url = `${window.location.origin}${window.location.pathname}#/worker/register/${inv.token}`;
     setInviteUrl(url);
+  };
+
+  const simulateApplicant = () => {
+    const samples = [
+      { name: "Ravi Kumar", phone: "+91 98401 23456" },
+      { name: "Suresh Babu", phone: "+91 98402 11223" },
+      { name: "Karthik M.", phone: "+91 98403 55667" },
+      { name: "Vignesh R.", phone: "+91 98404 77889" },
+    ];
+    const s = samples[Math.floor(Math.random() * samples.length)];
+    const w: MechanicWorker = {
+      id: `wk_sim_${Date.now()}`,
+      shopId: shop.id,
+      shopName: shop.shopName,
+      name: s.name,
+      phone: s.phone,
+      aadhaarUrl: "https://images.unsplash.com/photo-1623674472827-bf6f1d22c8e3?w=600",
+      panUrl: "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600",
+      extraDocs: [],
+      status: "pending",
+      createdAt: new Date().toISOString(),
+      lat: 12.92 + Math.random() * 0.05,
+      lng: 80.12 + Math.random() * 0.05,
+    };
+    addWorker(w);
+    pushNotification({
+      audience: "owner",
+      audienceId: shop.id,
+      title: "New worker application",
+      body: `${w.name} has applied to join your shop.`,
+    });
+    setTab("pending");
+    setTick((t) => t + 1);
+    toast.success(`Test applicant added: ${w.name}`);
   };
 
   const shareInvite = async (url: string) => {
@@ -157,6 +192,12 @@ const MechanicWorkersScreen = () => {
         >
           <UserPlus className="w-4 h-4" /> Invite Worker
         </motion.button>
+        <button
+          onClick={simulateApplicant}
+          className="w-full mt-2 h-10 rounded-xl border border-dashed border-primary/40 text-primary text-body-sm font-semibold"
+        >
+          + Simulate test applicant (demo)
+        </button>
       </div>
 
       <div className="flex bg-secondary mx-4 mt-3 rounded-xl p-1">
