@@ -65,6 +65,14 @@ import MechanicShopDetailScreen from "./pages/MechanicShopDetailScreen";
 import MechanicBookingsScreen from "./pages/MechanicBookingsScreen";
 import MechanicReviewsScreen from "./pages/MechanicReviewsScreen";
 import ConsumerMechanicBookingsScreen from "./pages/ConsumerMechanicBookingsScreen";
+import MechanicWorkersScreen from "./pages/MechanicWorkersScreen";
+import WorkerRegisterScreen from "./pages/WorkerRegisterScreen";
+import WorkerPendingScreen from "./pages/WorkerPendingScreen";
+import WorkerDashboardScreen from "./pages/WorkerDashboardScreen";
+import WorkerProfileScreen from "./pages/WorkerProfileScreen";
+import ConsumerMobileMechanicRequestScreen from "./pages/ConsumerMobileMechanicRequestScreen";
+import ConsumerMobileMechanicStatusScreen from "./pages/ConsumerMobileMechanicStatusScreen";
+import AdminMobilePricingScreen from "./pages/AdminMobilePricingScreen";
 
 import AdminDashboardScreen from "./pages/AdminDashboardScreen";
 import RolePickerScreen from "./pages/RolePickerScreen";
@@ -438,6 +446,12 @@ const AnimatedRoutes = () => {
         <Route path="/mechanic/dashboard" element={<MechanicDashboardScreen />} />
         <Route path="/mechanic/bookings" element={<MechanicBookingsScreen />} />
         <Route path="/mechanic/reviews" element={<MechanicReviewsScreen />} />
+        <Route path="/mechanic/workers" element={<MechanicWorkersScreen />} />
+        {/* Worker (mechanic employee) routes */}
+        <Route path="/worker/register/:token" element={<WorkerRegisterScreen />} />
+        <Route path="/worker/pending" element={<WorkerPendingScreen />} />
+        <Route path="/worker/dashboard" element={<WorkerDashboardScreen />} />
+        <Route path="/worker/profile" element={<WorkerProfileScreen />} />
         <Route
           path="/mechanics/:id"
           element={
@@ -454,12 +468,36 @@ const AnimatedRoutes = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/mobile-mechanic"
+          element={
+            <ProtectedRoute role="user">
+              <ConsumerMobileMechanicRequestScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mobile-mechanic/:id"
+          element={
+            <ProtectedRoute role="user">
+              <ConsumerMobileMechanicStatusScreen />
+            </ProtectedRoute>
+          }
+        />
         {/* Admin routes */}
         <Route
           path="/admin/dashboard"
           element={
             <ProtectedRoute role="admin">
               <AdminDashboardScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/mobile-pricing"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminMobilePricingScreen />
             </ProtectedRoute>
           }
         />

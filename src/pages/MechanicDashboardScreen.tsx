@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Wrench, Star, MapPin, Settings, LogOut, IndianRupee, Eye, ToggleLeft, ToggleRight, ClipboardList, MessageSquare } from "lucide-react";
-import { getMechanicAuth, getMechanicShop, getShopBookings, setMechanicAuth, setMechanicShop } from "@/lib/mechanic";
+import { Wrench, Star, MapPin, Settings, LogOut, IndianRupee, Eye, ToggleLeft, ToggleRight, ClipboardList, MessageSquare, Users, Bell } from "lucide-react";
+import { getMechanicAuth, getMechanicShop, getShopBookings, setMechanicAuth, setMechanicShop, getWorkersForShop, getNotifications } from "@/lib/mechanic";
 
 const MechanicDashboardScreen = () => {
   const navigate = useNavigate();
@@ -13,6 +13,10 @@ const MechanicDashboardScreen = () => {
   const completedBookings = bookings.filter((b) => b.status === "completed");
   const earnings = completedBookings.reduce((sum, b) => sum + (b.price || 0), 0);
   const views = 180 + bookings.length * 37 + completedBookings.length * 24;
+  const workers = shop ? getWorkersForShop(shop.id) : [];
+  const pendingWorkers = workers.filter((w) => w.status === "pending").length;
+  const ownerNotifs = shop ? getNotifications("owner", shop.id) : [];
+  const unreadNotifs = ownerNotifs.filter((n) => !n.read).length;
 
   // Seed mock reviews tied to completed bookings if shop has none
   useEffect(() => {
@@ -67,6 +71,14 @@ const MechanicDashboardScreen = () => {
             <p className="text-caption text-muted-foreground">Welcome back</p>
             <p className="text-body font-bold text-foreground">{auth.name}</p>
           </div>
+          <button onClick={() => navigate("/mechanic/workers")} className="touch-target relative text-muted-foreground">
+            <Bell className="w-5 h-5" />
+            {unreadNotifs > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-destructive text-white text-[10px] font-bold flex items-center justify-center">
+                {unreadNotifs}
+              </span>
+            )}
+          </button>
           <button onClick={logout} className="touch-target text-muted-foreground"><LogOut className="w-5 h-5" /></button>
         </div>
       </header>
@@ -140,6 +152,19 @@ const MechanicDashboardScreen = () => {
           {pendingCount > 0 && (
             <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-destructive text-white text-caption font-bold flex items-center justify-center">
               {pendingCount}
+            </span>
+          )}
+        </motion.button>
+
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={() => navigate("/mechanic/workers")}
+          className="w-full h-12 rounded-xl bg-secondary text-foreground font-semibold flex items-center justify-center gap-2 relative"
+        >
+          <Users className="w-4 h-4" /> Workers ({workers.length})
+          {pendingWorkers > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-warning text-white text-caption font-bold flex items-center justify-center">
+              {pendingWorkers}
             </span>
           )}
         </motion.button>
