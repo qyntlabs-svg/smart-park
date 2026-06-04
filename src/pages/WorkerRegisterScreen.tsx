@@ -21,6 +21,30 @@ const fileToDataUrl = (f: File) =>
     r.readAsDataURL(f);
   });
 
+// Downscale large images so we don't blow past localStorage quota.
+const compressImage = (dataUrl: string, maxDim = 1280, quality = 0.7) =>
+  new Promise<string>((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return resolve(dataUrl);
+      ctx.drawImage(img, 0, 0, w, h);
+      try {
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      } catch {
+        resolve(dataUrl);
+      }
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+
 const WorkerRegisterScreen = () => {
   const { token } = useParams();
   const navigate = useNavigate();
@@ -66,12 +90,24 @@ const WorkerRegisterScreen = () => {
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>, set: (v: string) => void) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (f.size > 4 * 1024 * 1024) return toast.error("File too large (max 4MB)");
-    set(await fileToDataUrl(f));
+    if (f.size > 20 * 1024 * 1024) return toast.error("File too large (max 20 MB)");
+    try {
+      const raw = await fileToDataUrl(f);
+      const out = f.type.startsWith("image/") ? await compressImage(raw) : raw;
+      set(out);
+      toast.success("Uploaded");
+    } catch {
+      toast.error("Could not read file");
+    }
   };
   const onPickExtras = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const urls = await Promise.all(files.map(fileToDataUrl));
+    const urls = await Promise.all(
+      files.map(async (f) => {
+        const raw = await fileToDataUrl(f);
+        return f.type.startsWith("image/") ? await compressImage(raw) : raw;
+      }),
+    );
     setExtras((prev) => [...prev, ...urls].slice(0, 5));
   };
 
@@ -98,16 +134,21 @@ const WorkerRegisterScreen = () => {
       lat,
       lng,
     };
-    addWorker(worker);
-    setWorkerAuth({ workerId: worker.id });
-    pushNotification({
-      audience: "owner",
-      audienceId: invite.shopId,
-      title: "New worker application",
-      body: `${worker.name} has applied to join your shop.`,
-    });
-    toast.success("Submitted — awaiting owner approval");
-    navigate("/worker/pending", { replace: true });
+    try {
+      addWorker(worker);
+      setWorkerAuth({ workerId: worker.id });
+      pushNotification({
+        audience: "owner",
+        audienceId: invite.shopId,
+        title: "New worker application",
+        body: `${worker.name} has applied to join your shop.`,
+      });
+      toast.success("Submitted — awaiting owner approval");
+      navigate("/worker/pending", { replace: true });
+    } catch (err) {
+      console.error("Worker submit failed", err);
+      toast.error("Could not save — try smaller document images");
+    }
   };
 
   return (
