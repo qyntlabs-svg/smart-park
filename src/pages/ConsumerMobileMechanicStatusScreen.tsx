@@ -19,6 +19,7 @@ import {
   getMechanicBookings,
   updateMechanicBooking,
   addReviewToShop,
+  getWorkerById,
   type MechanicBooking,
 } from "@/lib/mechanic";
 import { toast } from "sonner";
@@ -77,7 +78,12 @@ const ConsumerMobileMechanicStatusScreen = () => {
 
   const submitReview = () => {
     if (!comment.trim()) return toast.error("Add a short comment");
-    addReviewToShop(booking.shopId === "mobile" ? booking.workerId || "mobile" : booking.shopId, {
+    let targetShopId = booking.shopId;
+    if (targetShopId === "mobile" && booking.workerId) {
+      const w = getWorkerById(booking.workerId);
+      if (w) targetShopId = w.shopId;
+    }
+    addReviewToShop(targetShopId, {
       user: user?.name || "Customer",
       rating,
       comment: comment.trim(),
