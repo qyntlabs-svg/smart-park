@@ -276,3 +276,30 @@ const MechanicBookingsScreen = () => {
 };
 
 export default MechanicBookingsScreen;
+
+const Metric = ({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "primary" | "muted" | "success" | "warning" | "destructive";
+}) => {
+  const toneCls =
+    tone === "primary"
+      ? "bg-primary/10 text-primary"
+      : tone === "success"
+        ? "bg-success/10 text-success"
+        : tone === "warning"
+          ? "bg-warning/10 text-warning"
+          : tone === "destructive"
+            ? "bg-destructive/10 text-destructive"
+            : "bg-secondary text-muted-foreground";
+  return (
+    <div className={`p-2.5 rounded-xl ${toneCls} flex items-center justify-between`}>
+      <span className="text-caption font-semibold">{label}</span>
+      <span className="text-body-sm font-bold">{value}</span>
+    </div>
+  );
+};
