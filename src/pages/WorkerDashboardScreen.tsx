@@ -152,6 +152,7 @@ const WorkerDashboardScreen = () => {
         customerName: "Anitha S.",
         customerPhone: "+91 98765 11111",
         customerLocation: { ...near(), address: "Selaiyur Main Rd, Tambaram" },
+        otp: "1234",
         priceBreakdown: { labour: 200, travel: 100, service: 150, nightSurcharge: 0 },
       },
       {
