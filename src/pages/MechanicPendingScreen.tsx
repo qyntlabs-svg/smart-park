@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Clock, CheckCircle2, LogOut } from "lucide-react";
-import { MobileButton } from "@/components/ui/mobile-button";
 import { getMechanicAuth, setMechanicAuth } from "@/lib/mechanic";
 
 const MechanicPendingScreen = () => {
@@ -13,12 +12,19 @@ const MechanicPendingScreen = () => {
     if (!auth) navigate("/mechanic/login", { replace: true });
   }, [auth, navigate]);
 
-  // Demo: simulate admin approval
-  const approveNow = () => {
+  // Mock: auto-approve after a short delay so the demo flows end-to-end.
+  useEffect(() => {
     if (!auth) return;
-    setMechanicAuth({ ...auth, status: "approved" });
-    navigate("/mechanic/setup", { replace: true });
-  };
+    if (auth.status === "approved") {
+      navigate("/mechanic/setup", { replace: true });
+      return;
+    }
+    const t = setTimeout(() => {
+      setMechanicAuth({ ...auth, status: "approved" });
+      navigate("/mechanic/setup", { replace: true });
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [auth, navigate]);
 
   const logout = () => {
     setMechanicAuth(null);
@@ -46,9 +52,9 @@ const MechanicPendingScreen = () => {
           <li className="flex gap-2"><Clock className="w-4 h-4 text-warning shrink-0" /> Approval (pending)</li>
         </ul>
       </div>
-      <MobileButton className="mt-6" fullWidth onClick={approveNow}>
-        Simulate Admin Approval
-      </MobileButton>
+      <p className="mt-6 text-caption text-muted-foreground">
+        Auto-approving for the demo… you'll be redirected shortly.
+      </p>
       <button onClick={logout} className="mt-4 flex items-center gap-2 text-body-sm text-muted-foreground">
         <LogOut className="w-4 h-4" /> Sign out
       </button>
