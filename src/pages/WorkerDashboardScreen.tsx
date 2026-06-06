@@ -190,6 +190,7 @@ const WorkerDashboardScreen = () => {
         customerLocation: { ...near(0.03), address: "Rajakilpakkam, Tambaram" },
         workerId: worker.id,
         workerName: worker.name,
+        otp: "1234",
         priceBreakdown: { labour: 600, travel: 120, service: 480, nightSurcharge: 0 },
       },
       {
