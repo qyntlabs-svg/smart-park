@@ -107,7 +107,7 @@ const MechanicsScreen = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              onClick={() => navigate(`/mechanics/${shop.id}`)}
+              onClick={() => navigate(`/mechanics/${shop.id}${filter !== "all" ? `?cat=${filter}` : ""}`)}
               className="w-full text-left bg-card border border-border rounded-2xl p-4 relative overflow-hidden"
             >
               <div className={`absolute top-4 right-4 px-2 py-0.5 rounded-md text-caption font-semibold ${
