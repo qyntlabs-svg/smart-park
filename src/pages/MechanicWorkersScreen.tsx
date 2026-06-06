@@ -15,6 +15,7 @@ import {
   FileText,
   Phone,
   LogIn,
+  Wrench,
 } from "lucide-react";
 import {
   getMechanicAuth,
@@ -50,6 +51,46 @@ const MechanicWorkersScreen = () => {
     if (!shop) return navigate("/mechanic/setup", { replace: true });
   }, [auth, shop, navigate]);
 
+  // Seed a couple of mock pending applicants the first time this shop has no workers.
+  useEffect(() => {
+    if (!shop) return;
+    const existing = getWorkersForShop(shop.id);
+    if (existing.length > 0) return;
+    const mocks: MechanicWorker[] = [
+      {
+        id: `wk_seed_${shop.id}_1`,
+        shopId: shop.id,
+        shopName: shop.shopName,
+        name: "Ravi Kumar",
+        phone: "+91 98401 23456",
+        aadhaarUrl: "https://images.unsplash.com/photo-1623674472827-bf6f1d22c8e3?w=600",
+        panUrl: "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600",
+        extraDocs: [],
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        lat: 12.93,
+        lng: 80.13,
+      },
+      {
+        id: `wk_seed_${shop.id}_2`,
+        shopId: shop.id,
+        shopName: shop.shopName,
+        name: "Suresh Babu",
+        phone: "+91 98402 11223",
+        aadhaarUrl: "https://images.unsplash.com/photo-1623674472827-bf6f1d22c8e3?w=600",
+        panUrl: "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600",
+        extraDocs: [],
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        lat: 12.91,
+        lng: 80.14,
+      },
+    ];
+    mocks.forEach(addWorker);
+    setTick((t) => t + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shop?.id]);
+
   const workers = useMemo(() => (shop ? getWorkersForShop(shop.id) : []), [shop, tick]);
   if (!shop) return null;
 
@@ -75,38 +116,31 @@ const MechanicWorkersScreen = () => {
     setInviteUrl(url);
   };
 
-  const simulateApplicant = () => {
-    const samples = [
-      { name: "Ravi Kumar", phone: "+91 98401 23456" },
-      { name: "Suresh Babu", phone: "+91 98402 11223" },
-      { name: "Karthik M.", phone: "+91 98403 55667" },
-      { name: "Vignesh R.", phone: "+91 98404 77889" },
-    ];
-    const s = samples[Math.floor(Math.random() * samples.length)];
+  const registerSelfAsWorker = () => {
+    if (!auth || !shop) return;
+    const existingSelf = workers.find((w) => w.phone === auth.phone);
+    if (existingSelf) {
+      setWorkerAuth({ workerId: existingSelf.id });
+      if (existingSelf.status === "approved") navigate("/worker/dashboard");
+      else navigate("/worker/pending");
+      return;
+    }
     const w: MechanicWorker = {
-      id: `wk_sim_${Date.now()}`,
+      id: `wk_owner_${shop.id}`,
       shopId: shop.id,
       shopName: shop.shopName,
-      name: s.name,
-      phone: s.phone,
-      aadhaarUrl: "https://images.unsplash.com/photo-1623674472827-bf6f1d22c8e3?w=600",
-      panUrl: "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600",
+      name: auth.name,
+      phone: auth.phone,
       extraDocs: [],
-      status: "pending",
+      status: "approved", // owner is auto-trusted in their own shop
       createdAt: new Date().toISOString(),
-      lat: 12.92 + Math.random() * 0.05,
-      lng: 80.12 + Math.random() * 0.05,
+      lat: shop.lat,
+      lng: shop.lng,
     };
     addWorker(w);
-    pushNotification({
-      audience: "owner",
-      audienceId: shop.id,
-      title: "New worker application",
-      body: `${w.name} has applied to join your shop.`,
-    });
-    setTab("pending");
-    setTick((t) => t + 1);
-    toast.success(`Test applicant added: ${w.name}`);
+    setWorkerAuth({ workerId: w.id });
+    toast.success("You're now also a worker — opening worker dashboard");
+    navigate("/worker/dashboard");
   };
 
   const shareInvite = async (url: string) => {
@@ -201,11 +235,14 @@ const MechanicWorkersScreen = () => {
           <UserPlus className="w-4 h-4" /> Invite Worker
         </motion.button>
         <button
-          onClick={simulateApplicant}
-          className="w-full mt-2 h-10 rounded-xl border border-dashed border-primary/40 text-primary text-body-sm font-semibold"
+          onClick={registerSelfAsWorker}
+          className="w-full mt-2 h-11 rounded-xl bg-secondary text-foreground text-body-sm font-semibold flex items-center justify-center gap-2"
         >
-          + Simulate test applicant (demo)
+          <Wrench className="w-4 h-4" /> Register myself as a worker
         </button>
+        <p className="text-caption text-muted-foreground mt-1 text-center">
+          Only workers can accept mobile mechanic jobs. Owners must register here to take dispatches.
+        </p>
       </div>
 
       <div className="flex bg-secondary mx-4 mt-3 rounded-xl p-1">
