@@ -232,6 +232,7 @@ const WorkerDashboardScreen = () => {
         workerId: worker.id,
         workerName: worker.name,
         paid: true,
+        otp: "1234",
         priceBreakdown: { labour: 900, travel: 150, service: 750, nightSurcharge: 0 },
       },
     ];
