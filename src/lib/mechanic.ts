@@ -613,6 +613,13 @@ export interface MechanicBooking {
     nightSurcharge: number;
   };
   services?: string[];
+  /** 4-digit OTP shown to consumer; required by worker (mobile) or shop owner (in-shop) to finish service */
+  otp?: string;
+  vehicleCategory?: VehicleCategory;
+}
+
+export function generateOtp(): string {
+  return String(Math.floor(1000 + Math.random() * 9000));
 }
 
 export function getMechanicBookings(): MechanicBooking[] {

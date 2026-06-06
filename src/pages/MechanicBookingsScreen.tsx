@@ -38,6 +38,8 @@ const MechanicBookingsScreen = () => {
   const [jobFilter, setJobFilter] = useState<JobFilter>("all");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [otpFor, setOtpFor] = useState<MechanicBooking | null>(null);
+  const [otpInput, setOtpInput] = useState("");
 
   useEffect(() => {
     if (!auth) return navigate("/mechanic/login", { replace: true });
@@ -98,6 +100,14 @@ const MechanicBookingsScreen = () => {
     toast.success("Marked as completed & paid");
     setQrFor(null);
     setTick((t) => t + 1);
+  };
+
+  const verifyOtpComplete = () => {
+    if (!otpFor) return;
+    if (otpInput.trim() !== (otpFor.otp || "")) return toast.error("Wrong OTP");
+    complete(otpFor);
+    setOtpFor(null);
+    setOtpInput("");
   };
 
   const openMaps = (b: MechanicBooking) => {
@@ -219,14 +229,20 @@ const MechanicBookingsScreen = () => {
             </div>
 
             {b.status === "pending" && (
-              <div className="grid grid-cols-2 gap-2">
-                <button onClick={() => reject(b)} className="h-10 rounded-xl bg-destructive/10 text-destructive font-semibold text-body-sm flex items-center justify-center gap-1">
-                  <X className="w-4 h-4" /> Reject
-                </button>
-                <button onClick={() => accept(b)} className="h-10 rounded-xl bg-primary text-primary-foreground font-semibold text-body-sm flex items-center justify-center gap-1">
-                  <Check className="w-4 h-4" /> Accept
-                </button>
-              </div>
+              inferJobType(b) === "mobile" ? (
+                <div className="p-3 rounded-xl bg-warning/10 text-warning text-caption font-semibold">
+                  Mobile job — only workers can accept. Register as a worker in your shop to take this.
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <button onClick={() => reject(b)} className="h-10 rounded-xl bg-destructive/10 text-destructive font-semibold text-body-sm flex items-center justify-center gap-1">
+                    <X className="w-4 h-4" /> Reject
+                  </button>
+                  <button onClick={() => accept(b)} className="h-10 rounded-xl bg-primary text-primary-foreground font-semibold text-body-sm flex items-center justify-center gap-1">
+                    <Check className="w-4 h-4" /> Accept
+                  </button>
+                </div>
+              )
             )}
 
             {b.status === "accepted" && (
@@ -240,8 +256,11 @@ const MechanicBookingsScreen = () => {
                   <button onClick={() => setQrFor(b)} className="h-10 rounded-xl bg-primary/10 text-primary font-semibold text-body-sm flex items-center justify-center gap-1">
                     <QrCode className="w-4 h-4" /> Payment QR
                   </button>
-                  <button onClick={() => complete(b)} className="h-10 rounded-xl bg-success text-white font-semibold text-body-sm flex items-center justify-center gap-1">
-                    <CheckCircle2 className="w-4 h-4" /> Complete
+                  <button
+                    onClick={() => (b.otp ? (setOtpFor(b), setOtpInput("")) : complete(b))}
+                    className="h-10 rounded-xl bg-success text-white font-semibold text-body-sm flex items-center justify-center gap-1"
+                  >
+                    <CheckCircle2 className="w-4 h-4" /> {b.otp ? "OTP & Complete" : "Complete"}
                   </button>
                 </div>
               </div>
@@ -268,6 +287,24 @@ const MechanicBookingsScreen = () => {
             <p className="text-caption text-muted-foreground">Customer scans this with any UPI app.</p>
             <MobileButton fullWidth onClick={() => complete(qrFor)}>Mark as Paid & Complete</MobileButton>
             <button onClick={() => setQrFor(null)} className="w-full h-10 text-body-sm text-muted-foreground">Close</button>
+          </div>
+        </div>
+      )}
+
+      {otpFor && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-4" onClick={() => setOtpFor(null)}>
+          <div className="w-full max-w-md bg-card rounded-3xl p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <p className="text-body font-bold">Customer arrival OTP</p>
+            <p className="text-caption text-muted-foreground">Ask {otpFor.customerName} to show their 4-digit code from the booking screen.</p>
+            <Input
+              value={otpInput}
+              onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, "").slice(0, 4))}
+              placeholder="1234"
+              inputMode="numeric"
+              className="h-14 rounded-xl text-center text-2xl font-bold tracking-[0.5em]"
+            />
+            <MobileButton fullWidth onClick={verifyOtpComplete}>Verify & mark complete</MobileButton>
+            <button onClick={() => setOtpFor(null)} className="w-full h-10 text-body-sm text-muted-foreground">Cancel</button>
           </div>
         </div>
       )}

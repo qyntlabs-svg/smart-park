@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, MapPin, Star, Phone, User, Eye, EyeOff, CheckCircle2, Store, Bike, Clock } from "lucide-react";
+import { ArrowLeft, MapPin, Star, Phone, User, EyeOff, CheckCircle2, Store, Bike, Clock, Navigation } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,12 +11,16 @@ import {
   MechanicService,
   maskContact,
   VEHICLE_CATEGORIES,
+  generateOtp,
+  type VehicleCategory,
 } from "@/lib/mechanic";
 import { useAuthStore } from "@/store/auth.store";
 import { toast } from "sonner";
 
 const MechanicShopDetailScreen = () => {
   const { id } = useParams();
+  const [search] = useSearchParams();
+  const catParam = search.get("cat") as VehicleCategory | "all" | null;
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const shop = useMemo(() => getPublicShops().find((s) => s.id === id), [id]);
@@ -52,6 +56,7 @@ const MechanicShopDetailScreen = () => {
 
   const groupedServices = VEHICLE_CATEGORIES
     .filter((c) => shop.categories.includes(c.key))
+    .filter((c) => !catParam || catParam === "all" || c.key === catParam)
     .map((c) => ({ ...c, list: shop.services.filter((s) => s.category === c.key) }))
     .filter((c) => c.list.length > 0);
 
@@ -74,12 +79,15 @@ const MechanicShopDetailScreen = () => {
       status: "pending",
       contactRevealed: false,
       serviceType,
+      jobType: serviceType === "shop" ? "in_shop" : "mobile",
       customerName,
       customerPhone,
       customerLocation:
         serviceType === "doorstep"
           ? { lat: 13.05 + Math.random() * 0.05, lng: 80.22 + Math.random() * 0.05, address: doorstepAddress.trim() }
           : undefined,
+      otp: generateOtp(),
+      vehicleCategory: selected.category,
     });
     setActiveBookingId(id);
     toast.success("Request sent! Awaiting mechanic approval.");
@@ -127,15 +135,34 @@ const MechanicShopDetailScreen = () => {
             )}
           </div>
           {revealed && activeBooking.serviceType === "shop" && (
-            <MobileButton
-              fullWidth
-              onClick={() => {
-                const url = `https://www.google.com/maps/dir/?api=1&destination=${shop.lat},${shop.lng}`;
-                window.open(url, "_blank");
-              }}
-            >
-              Open Shop in Google Maps
-            </MobileButton>
+            <div className="p-4 rounded-2xl bg-card border border-border space-y-3">
+              <div>
+                <p className="text-caption text-muted-foreground">Shop address</p>
+                <p className="text-body-sm font-semibold text-foreground flex items-start gap-1 mt-0.5">
+                  <MapPin className="w-4 h-4 text-primary mt-0.5" /> {shop.address}
+                </p>
+              </div>
+              <MobileButton
+                fullWidth
+                onClick={() => {
+                  const url = `https://www.google.com/maps/dir/?api=1&destination=${shop.lat},${shop.lng}`;
+                  window.open(url, "_blank");
+                }}
+              >
+                <Navigation className="w-4 h-4 mr-1" /> Navigate to shop
+              </MobileButton>
+              {activeBooking.otp && (
+                <div className="p-3 rounded-xl bg-primary/5 border border-primary/30 text-center">
+                  <p className="text-caption text-muted-foreground">Show this OTP at the shop</p>
+                  <p className="text-3xl font-extrabold text-primary tracking-[0.4em] mt-1">
+                    {activeBooking.otp}
+                  </p>
+                  <p className="text-caption text-muted-foreground mt-1">
+                    Shop will enter this code to confirm your arrival & complete service.
+                  </p>
+                </div>
+              )}
+            </div>
           )}
           <button
             className="w-full h-11 rounded-xl bg-secondary text-body-sm font-semibold"
