@@ -173,6 +173,19 @@ const ConsumerMobileMechanicStatusScreen = () => {
           </div>
         )}
 
+        {booking.otp &&
+          ["assigned", "on_the_way"].includes(booking.status) && (
+            <div className="p-4 rounded-2xl bg-primary/5 border border-primary/30 text-center">
+              <p className="text-caption text-muted-foreground">Show this OTP to your mechanic on arrival</p>
+              <p className="text-3xl font-extrabold text-primary tracking-[0.4em] mt-2">
+                {booking.otp}
+              </p>
+              <p className="text-caption text-muted-foreground mt-2">
+                Service starts only after the mechanic enters this code.
+              </p>
+            </div>
+          )}
+
         {(booking.status === "in_progress" || booking.status === "completed") && !booking.paid && (
           <MobileButton fullWidth onClick={() => setPayOpen(true)}>
             <QrCode className="w-4 h-4 mr-1" /> Pay ₹{booking.price} via UPI
