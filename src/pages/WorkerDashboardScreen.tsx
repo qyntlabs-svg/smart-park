@@ -31,6 +31,7 @@ import {
 } from "@/lib/mechanic";
 import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const TABS = [
   { key: "new", label: "New" },
@@ -45,6 +46,8 @@ const WorkerDashboardScreen = () => {
   const [tick, setTick] = useState(0);
   const worker = useMemo(() => (auth ? getWorkerById(auth.workerId) : null), [auth, tick]);
   const [tab, setTab] = useState<Tab>("new");
+  const [otpFor, setOtpFor] = useState<MechanicBooking | null>(null);
+  const [otpInput, setOtpInput] = useState("");
 
   useEffect(() => {
     if (!auth || !worker) return navigate("/", { replace: true });
@@ -107,6 +110,17 @@ const WorkerDashboardScreen = () => {
     toast.success(`Marked ${status.replace("_", " ")}`);
     setTick((t) => t + 1);
   };
+
+  const verifyAndStart = () => {
+    if (!otpFor) return;
+    if (otpInput.trim() !== (otpFor.otp || "")) {
+      return toast.error("Invalid OTP — ask the customer");
+    }
+    setStatus(otpFor, "in_progress");
+    setOtpFor(null);
+    setOtpInput("");
+  };
+
   const openMaps = (b: MechanicBooking) => {
     if (!b.customerLocation) return;
     window.open(
@@ -345,8 +359,8 @@ const WorkerDashboardScreen = () => {
               )}
 
               {b.status === "on_the_way" && (
-                <button onClick={() => setStatus(b, "in_progress")} className="w-full h-10 rounded-xl bg-primary text-primary-foreground font-semibold text-body-sm flex items-center justify-center gap-1">
-                  <PlayCircle className="w-4 h-4" /> Start service
+                <button onClick={() => { setOtpFor(b); setOtpInput(""); }} className="w-full h-10 rounded-xl bg-primary text-primary-foreground font-semibold text-body-sm flex items-center justify-center gap-1">
+                  <PlayCircle className="w-4 h-4" /> Enter OTP to start
                 </button>
               )}
 
@@ -378,6 +392,26 @@ const WorkerDashboardScreen = () => {
           <LogOut className="w-4 h-4" />
         </button>
       </div>
+
+      {otpFor && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-4" onClick={() => setOtpFor(null)}>
+          <div className="w-full max-w-md bg-card rounded-3xl p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <p className="text-body font-bold">Enter customer's OTP</p>
+            <p className="text-caption text-muted-foreground">Ask {otpFor.customerName} for the 4-digit code shown in their app.</p>
+            <Input
+              value={otpInput}
+              onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, "").slice(0, 4))}
+              placeholder="1234"
+              inputMode="numeric"
+              className="h-14 rounded-xl text-center text-2xl font-bold tracking-[0.5em]"
+            />
+            <button onClick={verifyAndStart} className="w-full h-11 rounded-xl bg-primary text-primary-foreground font-semibold text-body-sm">
+              Verify & start service
+            </button>
+            <button onClick={() => setOtpFor(null)} className="w-full h-10 text-body-sm text-muted-foreground">Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
