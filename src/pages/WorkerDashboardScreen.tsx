@@ -152,6 +152,7 @@ const WorkerDashboardScreen = () => {
         customerName: "Anitha S.",
         customerPhone: "+91 98765 11111",
         customerLocation: { ...near(), address: "Selaiyur Main Rd, Tambaram" },
+        otp: "1234",
         priceBreakdown: { labour: 200, travel: 100, service: 150, nightSurcharge: 0 },
       },
       {
@@ -169,6 +170,7 @@ const WorkerDashboardScreen = () => {
         customerName: "Vikram P.",
         customerPhone: "+91 98765 22222",
         customerLocation: { ...near(0.04), address: "Camp Rd, Selaiyur" },
+        otp: "1234",
         priceBreakdown: { labour: 150, travel: 80, service: 70, nightSurcharge: 0 },
       },
       {
@@ -188,6 +190,7 @@ const WorkerDashboardScreen = () => {
         customerLocation: { ...near(0.03), address: "Rajakilpakkam, Tambaram" },
         workerId: worker.id,
         workerName: worker.name,
+        otp: "1234",
         priceBreakdown: { labour: 600, travel: 120, service: 480, nightSurcharge: 0 },
       },
       {
@@ -208,6 +211,7 @@ const WorkerDashboardScreen = () => {
         workerId: worker.id,
         workerName: worker.name,
         paid: true,
+        otp: "1234",
         priceBreakdown: { labour: 300, travel: 100, service: 150, nightSurcharge: 0 },
       },
       {
@@ -228,6 +232,7 @@ const WorkerDashboardScreen = () => {
         workerId: worker.id,
         workerName: worker.name,
         paid: true,
+        otp: "1234",
         priceBreakdown: { labour: 900, travel: 150, service: 750, nightSurcharge: 0 },
       },
     ];
