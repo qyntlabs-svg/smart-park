@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, MapPin, Moon, Info } from "lucide-react";
+import { ArrowLeft, MapPin, Moon, Info, LocateFixed, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { MobileButton } from "@/components/ui/mobile-button";
 import {
@@ -9,6 +9,7 @@ import {
   calcMobileQuote,
   addMechanicBooking,
   pushNotification,
+  generateOtp,
   type MechanicBooking,
 } from "@/lib/mechanic";
 import { useAuthStore } from "@/store/auth.store";
@@ -20,18 +21,52 @@ const ConsumerMobileMechanicRequestScreen = () => {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const [selected, setSelected] = useState<string[]>([]);
-  const [address, setAddress] = useState(DEFAULT_LOC.address);
+  const [address, setAddress] = useState("");
   const [loc, setLoc] = useState(DEFAULT_LOC);
   const [distanceKm, setDistanceKm] = useState(4.5);
+  const [locating, setLocating] = useState(false);
+  const [locStatus, setLocStatus] = useState<"idle" | "ok" | "failed">("idle");
 
+  const fetchLiveLocation = () => {
+    if (!navigator.geolocation) {
+      setLocStatus("failed");
+      toast.error("Location not supported on this device");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const next = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          address: address || `Lat ${pos.coords.latitude.toFixed(4)}, Lng ${pos.coords.longitude.toFixed(4)}`,
+        };
+        setLoc(next);
+        if (!address) setAddress(next.address);
+        setLocStatus("ok");
+        setLocating(false);
+        toast.success("Live location captured");
+      },
+      () => {
+        setLocStatus("failed");
+        setLocating(false);
+        toast.error("Couldn't get location — enter address manually");
+      },
+      { timeout: 8000, enableHighAccuracy: true },
+    );
+  };
+
+  // Try once on mount (silent)
   useEffect(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      (pos) => setLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude, address }),
-      () => {/* keep default */},
+      (pos) => {
+        setLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude, address: "" });
+        setLocStatus("ok");
+      },
+      () => setLocStatus("failed"),
       { timeout: 4000 },
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const services = MOBILE_SERVICE_CATALOGUE.filter((s) => selected.includes(s.id)).map((s) => s.name);
@@ -43,6 +78,7 @@ const ConsumerMobileMechanicRequestScreen = () => {
   const submit = () => {
     if (selected.length === 0) return toast.error("Pick at least one service");
     if (!address.trim()) return toast.error("Enter your address");
+    if (locStatus !== "ok") return toast.error("Share your live location first");
 
     const id = `mb_${Date.now()}`;
     const customerName = user?.name || "Guest User";
@@ -68,6 +104,7 @@ const ConsumerMobileMechanicRequestScreen = () => {
         service: quote.service,
         nightSurcharge: quote.nightSurcharge,
       },
+      otp: generateOtp(),
     };
     addMechanicBooking(booking);
     pushNotification({
@@ -114,6 +151,19 @@ const ConsumerMobileMechanicRequestScreen = () => {
           <p className="text-body-sm font-semibold text-foreground mb-1 flex items-center gap-1">
             <MapPin className="w-4 h-4 text-primary" /> Service location
           </p>
+          <button
+            type="button"
+            onClick={fetchLiveLocation}
+            disabled={locating}
+            className={`mb-2 w-full h-10 rounded-xl flex items-center justify-center gap-2 text-body-sm font-semibold ${
+              locStatus === "ok"
+                ? "bg-success/10 text-success"
+                : "bg-primary text-primary-foreground"
+            }`}
+          >
+            {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <LocateFixed className="w-4 h-4" />}
+            {locStatus === "ok" ? "Live location captured · tap to refresh" : "Use my live location"}
+          </button>
           <Input
             value={address}
             onChange={(e) => setAddress(e.target.value)}
