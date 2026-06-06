@@ -170,6 +170,7 @@ const WorkerDashboardScreen = () => {
         customerName: "Vikram P.",
         customerPhone: "+91 98765 22222",
         customerLocation: { ...near(0.04), address: "Camp Rd, Selaiyur" },
+        otp: "1234",
         priceBreakdown: { labour: 150, travel: 80, service: 70, nightSurcharge: 0 },
       },
       {
