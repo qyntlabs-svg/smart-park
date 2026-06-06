@@ -10,8 +10,6 @@ import {
   getShopBookings,
   MechanicBooking,
   updateMechanicBooking,
-  getWorkersForShop,
-  getMechanicAuth as _ga,
 } from "@/lib/mechanic";
 import { toast } from "sonner";
 
