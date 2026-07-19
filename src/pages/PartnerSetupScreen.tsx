@@ -70,7 +70,6 @@ const PartnerSetupScreen = () => {
   const commission = calculateCommission(parseInt(hourlyRate) || 0);
 
   const setupMutation = usePartnerSetupMutation();
-  const { data: partnerStatus, isLoading: checkingStatus } = usePartnerStatus();
   const { data: existingSetup } = usePartnerSetup();
   const { data: slots = [], isLoading: loadingSlots } = usePartnerSlots();
   const addSlotsMutation = useAddSlots();
@@ -86,35 +85,7 @@ const PartnerSetupScreen = () => {
   const [editingSlot, setEditingSlot] = useState<string | null>(null);
   const [editSlotNumber, setEditSlotNumber] = useState("");
 
-  // Block access if not approved
-  if (checkingStatus) {
-    return (
-      <div className="min-h-[100dvh] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-      </div>
-    );
-  }
-
-  if (!partnerStatus?.is_active || partnerStatus?.kyc_status !== "approved") {
-    return (
-      <div className="min-h-[100dvh] w-full max-w-md mx-auto bg-background flex flex-col items-center justify-center px-6 text-center">
-        <div className="w-20 h-20 rounded-full bg-warning/10 flex items-center justify-center mb-4">
-          <AlertTriangle className="w-10 h-10 text-warning" />
-        </div>
-        <h2 className="text-heading-sm text-foreground">Not Authorized</h2>
-        <p className="mt-2 text-body-sm text-muted-foreground max-w-xs">
-          You cannot create parking slots until your account is approved by
-          admin.
-        </p>
-        <MobileButton
-          className="mt-6"
-          onClick={() => navigate("/partner/pending", { replace: true })}
-        >
-          Check Approval Status
-        </MobileButton>
-      </div>
-    );
-  }
+  // Approval gate disabled for demo — partners land here directly after KYC
 
   // If facility already exists → show slot management instead of setup wizard
   if (existingSetup) {

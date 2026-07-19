@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -15,13 +15,7 @@ import {
 } from "lucide-react";
 import { MobileButton } from "@/components/ui/mobile-button";
 import { Input } from "@/components/ui/input";
-import {
-  useSubmitKyc,
-  usePartnerStatus,
-  usePartnerRegister,
-} from "@/api/partner";
 import { toast } from "sonner";
-import api from "@/lib/axios";
 import LocationPicker from "@/components/LocationPicker";
 
 type DocStatus = "pending" | "uploading" | "uploaded";
@@ -41,75 +35,19 @@ const PartnerKycScreen = () => {
   const [vehicleType, setVehicleType] = useState<("car" | "bike")[]>([]);
   const [photos, setPhotos] = useState(0);
   const [businessName, setBusinessName] = useState("");
-
-  const submitKyc = useSubmitKyc();
-  const partnerRegister = usePartnerRegister();
-  const { data: partnerStatus, isLoading } = usePartnerStatus();
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
-  const [registering, setRegistering] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Only redirect away if fully approved — let pending/rejected stay to upload docs
-  useEffect(() => {
-    if (!partnerStatus) return;
-    if (partnerStatus.kyc_status === "approved" && partnerStatus.is_active) {
-      navigate("/partner/setup", { replace: true });
+  const mockUpload = (key: string, file: File) => {
+    if (file.size > 20 * 1024 * 1024) {
+      toast.error("File must be under 20MB");
+      return;
     }
-  }, [partnerStatus, navigate]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-[100dvh] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-      </div>
-    );
-  }
-
-  const ensureRegistered = async (): Promise<boolean> => {
-    if (partnerStatus?.registered) return true;
-    if (!businessName.trim()) {
-      toast.error("Please enter your business name first");
-      return false;
-    }
-    setRegistering(true);
-    try {
-      await partnerRegister.mutateAsync(businessName.trim());
-      return true;
-    } catch (err: any) {
-      const code = err?.response?.data?.error?.code;
-      // Already registered is fine — proceed
-      if (code === "PARTNER_ALREADY_EXISTS") return true;
-      toast.error(err?.response?.data?.error?.message || "Registration failed");
-      return false;
-    } finally {
-      setRegistering(false);
-    }
-  };
-
-  const realUpload = async (key: string, file: File) => {
-    const docTypeMap: Record<string, string> = {
-      govId: "gov_id",
-      businessProof: "business_proof",
-      ownershipProof: "ownership_proof",
-    };
-
-    // Register partner first if not yet done
-    const ok = await ensureRegistered();
-    if (!ok) return;
-
     setDocs((prev) => ({ ...prev, [key]: "uploading" }));
-    try {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("doc_type", docTypeMap[key]);
-      await api.post("/partner/kyc/documents", form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+    setTimeout(() => {
       setDocs((prev) => ({ ...prev, [key]: "uploaded" }));
       toast.success("Document uploaded");
-    } catch (err: any) {
-      setDocs((prev) => ({ ...prev, [key]: "pending" }));
-      toast.error(err?.response?.data?.error?.message || "Upload failed");
-    }
+    }, 500);
   };
 
   const handleFileSelect = (
@@ -118,12 +56,9 @@ const PartnerKycScreen = () => {
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File must be under 5MB");
-      return;
-    }
-    realUpload(key, file);
+    mockUpload(key, file);
   };
+
   const toggleVehicle = (v: "car" | "bike") =>
     setVehicleType((prev) =>
       prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
@@ -131,12 +66,8 @@ const PartnerKycScreen = () => {
 
   const canProceed = () => {
     if (step === 1) {
-      // Need business name + at least docs uploading/uploaded
       const allUploaded = Object.values(docs).every((d) => d === "uploaded");
-      return (
-        allUploaded &&
-        (partnerStatus?.registered || businessName.trim().length > 0)
-      );
+      return allUploaded && businessName.trim().length > 0;
     }
     if (step === 2) return address.length > 5;
     if (step === 3) return !!parkingType && vehicleType.length > 0;
@@ -144,35 +75,19 @@ const PartnerKycScreen = () => {
   };
 
   const handleNext = async () => {
-    if (step === 1) {
-      // Ensure registered before moving on
-      const ok = await ensureRegistered();
-      if (!ok) return;
-      setStep(2);
-      return;
-    }
     if (step < 4) {
       setStep(step + 1);
       return;
     }
-
-    // Step 4: submit KYC
-    try {
-      await submitKyc.mutateAsync({
-        address,
-        latitude,
-        longitude,
-        parking_type: parkingType as "open" | "covered",
-        accepts_two_wheeler: vehicleType.includes("bike"),
-        accepts_four_wheeler: vehicleType.includes("car"),
-      });
+    setSubmitting(true);
+    setTimeout(() => {
+      localStorage.setItem(
+        "partner-kyc",
+        JSON.stringify({ businessName, address, latitude, longitude, parkingType, vehicleType }),
+      );
       toast.success("KYC submitted for review!");
       navigate("/partner/pending", { replace: true });
-    } catch (err: any) {
-      toast.error(
-        err?.response?.data?.error?.message || "Submission failed. Try again.",
-      );
-    }
+    }, 400);
   };
 
   const docItems = [
@@ -235,25 +150,23 @@ const PartnerKycScreen = () => {
             <p className="text-body-sm text-muted-foreground">
               Tap each document to mark as uploaded
             </p>
-            {!partnerStatus?.registered && (
-              <div className="mt-2">
-                <p className="text-body-sm font-semibold text-foreground mb-1">
-                  Business Name
-                </p>
-                <Input
-                  placeholder="e.g. City Center Parking"
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  className="h-12 rounded-xl"
-                />
-              </div>
-            )}
+            <div className="mt-2">
+              <p className="text-body-sm font-semibold text-foreground mb-1">
+                Business Name
+              </p>
+              <Input
+                placeholder="e.g. City Center Parking"
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+                className="h-12 rounded-xl"
+              />
+            </div>
             <div className="mt-4 space-y-3">
               {docItems.map((doc) => (
                 <button
                   key={doc.key}
                   onClick={() => fileInputRefs.current[doc.key]?.click()}
-                  disabled={docs[doc.key] === "uploading" || registering}
+                  disabled={docs[doc.key] === "uploading"}
                   className="w-full flex items-center gap-3 p-4 bg-card border border-border rounded-2xl text-left"
                 >
                   <input
@@ -462,9 +375,9 @@ const PartnerKycScreen = () => {
           fullWidth
           onClick={handleNext}
           disabled={!canProceed()}
-          loading={submitKyc.isPending}
+          loading={submitting}
         >
-          {submitKyc.isPending ? (
+          {submitting ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" /> Submitting…
             </>
