@@ -34,8 +34,7 @@ const PartnerLoginScreen = () => {
       return;
     }
     setError("");
-    const registeredKey = `partner-registered-${phone}`;
-    const isRegistered = localStorage.getItem(registeredKey) === "1";
+    const isRegistered = localStorage.getItem(`partner-registered-${phone}`) === "1";
     setAuth("demo-partner-token-" + phone, {
       id: "partner-" + phone,
       phone,
@@ -46,7 +45,8 @@ const PartnerLoginScreen = () => {
     });
     setActiveRole("partner");
     if (!isRegistered) {
-      navigate("/partner/register", { replace: true });
+      localStorage.setItem(`partner-registered-${phone}`, "1");
+      navigate("/partner/kyc", { replace: true });
       return;
     }
     navigate("/partner/dashboard", { replace: true });
