@@ -510,4 +510,24 @@ const Section = ({
   </section>
 );
 
+const PriceCard = ({
+  label,
+  amount,
+  suffix,
+}: {
+  label: string;
+  amount: number;
+  suffix: string;
+}) => (
+  <div className="rounded-xl border border-border bg-card p-3 text-center">
+    <p className="text-caption text-muted-foreground">{label}</p>
+    <p className="mt-1 text-body-sm font-bold text-foreground">
+      ₹{amount}
+      <span className="text-caption font-normal text-muted-foreground">
+        {suffix}
+      </span>
+    </p>
+  </div>
+);
+
 export default ConsumerParkingRentalDetailScreen;
