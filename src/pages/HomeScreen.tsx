@@ -1011,7 +1011,7 @@ const ActivationChecklist = () => {
       key: "upi",
       label: "Add UPI payment method",
       done: hasPaid,
-      onClick: () => navigate("/ev"),
+      onClick: () => navigate("/wallet"),
     },
     {
       key: "reserve",
