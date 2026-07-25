@@ -1,121 +1,59 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Store, Loader2 } from "lucide-react";
+import { ArrowLeft, Store, ChevronDown } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { MobileButton } from "@/components/ui/mobile-button";
-import { useLogout } from "@/api/auth";
-import api from "@/lib/axios";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth.store";
-
-declare global {
-  interface Window {
-    initSendOTP?: (config: Record<string, unknown>) => void;
-  }
-}
 
 const PartnerLoginScreen = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
-  const [widgetReady, setWidgetReady] = useState(false);
-  const [notRegistered, setNotRegistered] = useState(false);
 
-  const logout = useLogout();
+  const setAuth = useAuthStore((s) => s.setAuth);
   const setActiveRole = useAuthStore((s) => s.setActiveRole);
-  const successFired = useRef(false);
 
-  // Load MSG91 widget script once
-  useEffect(() => {
-    if (document.getElementById("msg91-widget-script")) {
-      setWidgetReady(true);
+  const handleSend = () => {
+    if (!/^\d{10}$/.test(phone)) {
+      setError("Enter a valid 10-digit number");
       return;
     }
-    const script = document.createElement("script");
-    script.id = "msg91-widget-script";
-    script.src = "https://verify.msg91.com/otp-provider.js";
-    script.async = true;
-    script.onload = () => setWidgetReady(true);
-    script.onerror = () =>
-      setError("Failed to load OTP widget. Check your connection.");
-    document.head.appendChild(script);
-  }, []);
-
-  // Launch widget once ready
-  useEffect(() => {
-    if (!widgetReady || !window.initSendOTP) return;
-
-    window.initSendOTP({
-      widgetId: import.meta.env.VITE_MSG91_WIDGET_ID as string,
-      tokenAuth: import.meta.env.VITE_MSG91_TOKEN_AUTH as string,
-      exposeMethods: false,
-      success: (data: { message?: string; type?: string }) => {
-        successFired.current = true;
-        const accessToken = data.message;
-        if (!accessToken) {
-          setError("OTP verification failed — no token received.");
-          return;
-        }
-        handleVerify(accessToken);
-      },
-      failure: () => {
-        if (successFired.current) return;
-        setError("OTP verification failed. Please try again.");
-      },
-    });
-  }, [widgetReady]);
-
-  const handleVerify = async (accessToken: string) => {
-    setLoading(true);
     setError("");
-    try {
-      const { data } = await api.post("/auth/verify-msg91", {
-        accessToken,
-      });
+    setStep("otp");
+    toast.success("OTP sent (use 123456 for demo)");
+  };
 
-      const roles: string[] = data.user.roles ?? [data.user.role];
-
-      // Approved partner — go straight to dashboard
-      if (roles.includes("partner")) {
-        setActiveRole("partner");
-        navigate("/partner/dashboard", { replace: true });
-        return;
-      }
-
-      // Check partner registration status
-      const statusRes = await api.get("/partner/status", {
-        headers: { Authorization: `Bearer ${data.token}` },
-      });
-      const status = statusRes.data.data;
-
-      if (!status?.registered) {
-        setNotRegistered(true);
-        return;
-      }
-
-      if (status.kyc_status === "rejected") {
-        setError(
-          `Your application was rejected. Reason: ${status.rejection_reason ?? "Please contact support."}`,
-        );
-        return;
-      }
-
-      if (status.kyc_status === "pending" || !status.is_active) {
-        setError("Your account is pending admin approval. Please wait.");
-        setTimeout(() => navigate("/partner/pending", { replace: true }), 1500);
-        return;
-      }
-
-      setActiveRole("partner");
-      navigate("/partner/dashboard", { replace: true });
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.error?.message ||
-          "Verification failed. Please try again.",
-      );
-    } finally {
-      setLoading(false);
+  const handleVerify = () => {
+    if (otp !== "123456") {
+      setError("Invalid OTP. Use 123456.");
+      return;
     }
+    setError("");
+    const registered = localStorage.getItem(`partner-registered-${phone}`);
+    const approved = localStorage.getItem(`partner-approved-${phone}`);
+    setAuth("demo-partner-" + phone, {
+      id: "partner-" + phone,
+      phone,
+      name: null,
+      role: "partner",
+      roles: ["partner"],
+      is_new_user: !registered,
+    });
+    setActiveRole("partner");
+    if (!registered) {
+      navigate("/partner/register", { replace: true });
+      return;
+    }
+    if (!approved) {
+      navigate("/partner/pending", { replace: true });
+      return;
+    }
+    navigate("/partner/dashboard", { replace: true });
   };
 
   return (
@@ -147,76 +85,61 @@ const PartnerLoginScreen = () => {
 
         <h1 className="text-heading-lg text-foreground">Partner Login</h1>
         <p className="mt-2 text-body-sm text-muted-foreground">
-          Verify your mobile number to continue
+          {step === "phone"
+            ? "Verify your mobile number to continue"
+            : `Enter the OTP sent to +91 ${phone}`}
         </p>
 
-        {notRegistered ? (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-8 p-5 bg-warning/5 border border-warning/20 rounded-2xl"
-          >
-            <p className="text-body-sm font-bold text-foreground">
-              Not registered as a partner
-            </p>
-            <p className="mt-1 text-body-sm text-muted-foreground">
-              This number is not registered as a partner yet. Would you like to
-              register?
-            </p>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mt-8 w-full bg-card rounded-2xl p-6 shadow-lg border border-border"
-          >
-            {!widgetReady ? (
-              <div className="flex flex-col items-center gap-3 py-4">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                <p className="text-body-sm text-muted-foreground">
-                  Loading OTP widget…
-                </p>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-8 w-full bg-card rounded-2xl p-6 shadow-lg border border-border space-y-4"
+        >
+          {step === "phone" ? (
+            <>
+              <label className="text-body-sm font-semibold text-foreground">Mobile Number</label>
+              <div className="flex gap-3">
+                <button className="flex items-center gap-1 h-14 px-3 rounded-xl border border-border bg-secondary text-body-sm font-medium text-foreground">
+                  🇮🇳 +91 <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                </button>
+                <Input
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  placeholder="98765 43210"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  className="h-14 rounded-xl text-body font-medium px-4"
+                />
               </div>
-            ) : loading ? (
-              <div className="flex flex-col items-center gap-3 py-4">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                <p className="text-body-sm text-muted-foreground">Verifying…</p>
-              </div>
-            ) : (
-              <div className="text-center py-2">
-                <p className="text-body-sm text-muted-foreground">
-                  A verification popup will appear to enter your mobile number
-                  and OTP.
-                </p>
-                {error && (
-                  <p className="mt-3 text-body-sm text-destructive">{error}</p>
-                )}
-              </div>
-            )}
-          </motion.div>
-        )}
+              <MobileButton fullWidth onClick={handleSend}>Send OTP</MobileButton>
+            </>
+          ) : (
+            <>
+              <label className="text-body-sm font-semibold text-foreground">OTP</label>
+              <Input
+                type="tel"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="123456"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                className="h-14 rounded-xl text-body font-medium px-4 text-center tracking-widest"
+              />
+              <p className="text-caption text-muted-foreground">Demo OTP: 123456</p>
+              <MobileButton fullWidth onClick={handleVerify}>Verify & Continue</MobileButton>
+              <button
+                onClick={() => setStep("phone")}
+                className="w-full text-center text-body-sm text-muted-foreground py-2"
+              >
+                Change number
+              </button>
+            </>
+          )}
+          {error && <p className="text-body-sm text-destructive">{error}</p>}
+        </motion.div>
       </div>
-
-      {notRegistered && (
-        <div className="px-6 pb-8 pb-safe space-y-3">
-          <MobileButton
-            fullWidth
-            onClick={async () => {
-              await logout.mutateAsync().catch(() => {});
-              navigate("/partner/register");
-            }}
-          >
-            Register as Partner
-          </MobileButton>
-          <button
-            onClick={() => setNotRegistered(false)}
-            className="w-full text-center text-body-sm text-muted-foreground py-2"
-          >
-            Use a different number
-          </button>
-        </div>
-      )}
     </div>
   );
 };
