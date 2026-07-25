@@ -132,8 +132,8 @@ export const hoverScale = { scale: 1.02 };
 export const hoverLift = {
   y: -2,
   boxShadow: "0 12px 32px -12px rgba(0, 0, 0, 0.18)",
-  transition: { duration: 0.18, ease: "easeOut" },
-};
+  transition: { duration: 0.18, ease: "easeOut" as const },
+} as const;
 
 // ---------- Route transitions ----------
 // Used by AnimatedPage; keep short so navigation feels instant.
