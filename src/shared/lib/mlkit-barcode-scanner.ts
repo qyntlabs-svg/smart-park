@@ -3,12 +3,11 @@
  * - Native (Android/iOS): camera preview behind the WebView; use scanner-active CSS.
  * - Web: requires a <video> for ML Kit web impl, or falls back to html5-qrcode.
  */
-import { Capacitor } from "@capacitor/core";
+import { Capacitor, type PluginListenerHandle } from "@capacitor/core";
 import {
   BarcodeFormat,
   BarcodeScanner,
   LensFacing,
-  type PluginListenerHandle,
 } from "@capacitor-mlkit/barcode-scanning";
 import { Html5Qrcode } from "html5-qrcode";
 

@@ -247,7 +247,7 @@ export async function listStations(
   origin?: { lat: number; lng: number },
 ): Promise<Array<EvStation & { distanceKm?: number }>> {
   const all = loadAll().filter((s) => passesFilters(s, filters));
-  const withDistance = origin
+  const withDistance: Array<EvStation & { distanceKm?: number }> = origin
     ? all.map((s) => ({
         ...s,
         distanceKm: haversineKm(origin, { lat: s.lat, lng: s.lng }),
