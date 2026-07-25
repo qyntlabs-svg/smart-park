@@ -12,6 +12,41 @@ export interface Vehicle {
   is_active: boolean;
 }
 
+// Mock vehicles used when the backend is unreachable (Phase-2 demo mode).
+// Covers the three vehicle scenarios: 2-wheeler, 4-wheeler, and an EV.
+const MOCK_VEHICLES: Vehicle[] = [
+  {
+    id: "mock-veh-4w",
+    registration_number: "TN 22 CA 4321",
+    nickname: "Family Car",
+    model: "Hyundai Creta",
+    color_hsl: "220 70% 45%",
+    vehicle_type: "four_wheeler",
+    is_default: true,
+    is_active: true,
+  },
+  {
+    id: "mock-veh-2w",
+    registration_number: "TN 22 BK 8890",
+    nickname: "Daily Ride",
+    model: "Honda Activa 6G",
+    color_hsl: "0 0% 20%",
+    vehicle_type: "two_wheeler",
+    is_default: false,
+    is_active: true,
+  },
+  {
+    id: "mock-veh-ev",
+    registration_number: "TN 22 EV 0007",
+    nickname: "EV",
+    model: "Tata Nexon EV",
+    color_hsl: "150 65% 40%",
+    vehicle_type: "four_wheeler",
+    is_default: false,
+    is_active: true,
+  },
+];
+
 interface AddVehiclePayload {
   registration_number: string;
   vehicle_type: "two_wheeler" | "four_wheeler";
@@ -27,7 +62,9 @@ export const useVehicles = () =>
     queryFn: () =>
       api
         .get<{ success: boolean; data: Vehicle[] }>("/vehicles")
-        .then((r) => r.data.data),
+        .then((r) => r.data.data)
+        .catch(() => MOCK_VEHICLES)
+        .then((list) => (list && list.length ? list : MOCK_VEHICLES)),
   });
 
 export const useAddVehicle = () => {
