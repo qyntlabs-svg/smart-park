@@ -41,12 +41,14 @@ const DeveloperUsageScreen = () => {
   const byDay = useMemo(() => {
     const list = usage.data ?? [];
     const cutoff = Date.now() - days * 86400000;
-    const dateMap = new Map<string, Record<string, number>>();
+    const dateMap = new Map<string, Record<string, number | string> & { date: string }>();
     list
       .filter((u) => Date.parse(u.date) >= cutoff)
       .forEach((u) => {
-        const row = dateMap.get(u.date) ?? { date: u.date };
-        row[u.keyId] = (row[u.keyId] ?? 0) + u.requests;
+        const row =
+          dateMap.get(u.date) ??
+          ({ date: u.date } as Record<string, number | string> & { date: string });
+        row[u.keyId] = ((row[u.keyId] as number) ?? 0) + u.requests;
         dateMap.set(u.date, row);
       });
     return Array.from(dateMap.values()).sort((a, b) =>

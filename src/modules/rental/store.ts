@@ -146,7 +146,7 @@ export async function listListings(
   origin?: { lat: number; lng: number },
 ): Promise<Array<RentalListing & { distanceKm?: number }>> {
   const all = loadAllListings().filter((l) => passesFilters(l, filters));
-  const withDistance = origin
+  const withDistance: Array<RentalListing & { distanceKm?: number }> = origin
     ? all.map((l) => ({
         ...l,
         distanceKm: haversineKm(origin, { lat: l.lat, lng: l.lng }),

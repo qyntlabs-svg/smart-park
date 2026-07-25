@@ -30,7 +30,7 @@ const AnimatedPage = forwardRef<HTMLDivElement, AnimatedPageProps>(
   ({ variants, disabled, children, ...rest }, ref) => {
     if (disabled) {
       return (
-        <div ref={ref} {...(rest as React.HTMLAttributes<HTMLDivElement>)}>
+        <div ref={ref} {...(rest as unknown as React.HTMLAttributes<HTMLDivElement>)}>
           {children}
         </div>
       );

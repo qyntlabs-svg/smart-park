@@ -31,7 +31,17 @@ const ProfileScreen = () => {
   const { data: profile } = useProfile();
   const logout = useLogout();
 
-  const menuItems = [
+  type MenuItem = {
+    icon: any;
+    label: string;
+    action?: () => void;
+    toggle?: boolean;
+    checked?: boolean;
+    onToggle?: (v: boolean) => void;
+    badge?: string;
+    destructive?: boolean;
+  };
+  const menuItems: MenuItem[] = [
     { icon: Car, label: "My Vehicles", action: () => navigate("/vehicles") },
     {
       icon: CreditCard,
