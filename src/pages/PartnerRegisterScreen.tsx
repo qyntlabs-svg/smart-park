@@ -196,20 +196,25 @@ const PartnerRegisterScreen = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 w-full bg-card rounded-2xl p-6 shadow-lg border border-border"
           >
-            {!widgetReady || loading ? (
-              <div className="flex flex-col items-center gap-3 py-4">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                <p className="text-body-sm text-muted-foreground">
-                  {loading ? "Registering…" : "Loading OTP widget…"}
-                </p>
-              </div>
-            ) : (
-              <div className="text-center py-2">
-                <p className="text-body-sm text-muted-foreground">
-                  A verification popup will appear for +91 {phone}
-                </p>
-              </div>
-            )}
+            <div className="text-center py-2 space-y-4">
+              <p className="text-body-sm text-muted-foreground">
+                A verification popup will appear for +91 {phone}
+              </p>
+              <MobileButton
+                fullWidth
+                onClick={() => {
+                  localStorage.setItem(`partner-registered-${phone}`, "1");
+                  localStorage.setItem(`partner-approved-${phone}`, "1");
+                  localStorage.setItem(
+                    `partner-business-${phone}`,
+                    businessName.trim(),
+                  );
+                  navigate("/partner/dashboard", { replace: true });
+                }}
+              >
+                Enter
+              </MobileButton>
+            </div>
             {error && (
               <p className="mt-3 text-body-sm text-destructive text-center">
                 {error}
